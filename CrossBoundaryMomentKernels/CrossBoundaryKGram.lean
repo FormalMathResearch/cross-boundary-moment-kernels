@@ -20,25 +20,8 @@ def crossBoundaryKGramLinear
       (crossBoundaryIntegrand h (k + 1) P.1 * crossBoundaryIntegrand h (k + 1) P.2 +
         crossBoundaryIntegrand h (k + 1) P.1 * crossBoundaryIntegrand h (k + 1) P.2)
 
-/-- The linear normal form equals the manifest square on the cross-boundary domain. -/
-lemma crossBoundaryKGramLinear_eq
-    (h : FullSupportMomentWeight) (k : ℕ)
-    {p q : ℝ × ℝ} (hp : p ∈ Ioc (0 : ℝ) (max p.1 p.1) ×ˢ Ioi 0)
-    (hq : q ∈ Ioc (0 : ℝ) (max q.1 q.1) ×ˢ Ioi 0) :
-    crossBoundaryKGramLinear h k (p, q) = crossBoundaryKGramIntegrand h k (p, q) := by
-  have hp1 : 0 < p.1 := hp.1.1
-  have hp2 : 0 < p.2 := hp.2
-  have hq1 : 0 < q.1 := hq.1.1
-  have hq2 : 0 < q.2 := hq.2
-  have hpK1 := crossBoundaryIntegrand_add_index h k 1 hp1 hp2
-  have hpK2 := crossBoundaryIntegrand_add_index h k 2 hp1 hp2
-  have hqK1 := crossBoundaryIntegrand_add_index h k 1 hq1 hq2
-  have hqK2 := crossBoundaryIntegrand_add_index h k 2 hq1 hq2
-  rw [crossBoundaryKGramLinear, crossBoundaryKGramIntegrand, hpK1, hpK2, hqK1, hqK2]
-  simp only [pow_one, pow_two]
-  ring
-
-/-- A simpler domain-specialized version of the Gram algebra identity. -/
+/-- The linear normal form equals the manifest square whenever both cross-boundary points
+have positive coordinates. -/
 lemma crossBoundaryKGramLinear_eq_of_pos
     (h : FullSupportMomentWeight) (k : ℕ)
     {p q : ℝ × ℝ} (hp1 : 0 < p.1) (hp2 : 0 < p.2)
@@ -57,7 +40,10 @@ lemma crossBoundaryKGramIntegrand_integrable
     (h : FullSupportMomentWeight) (k : ℕ) {u : ℝ} (hu : 0 < u) :
     Integrable (crossBoundaryKGramIntegrand h k)
       ((crossBoundaryBaseMeasure u).prod (crossBoundaryBaseMeasure u)) := by
-  let μ := crossBoundaryBaseMeasure u
+  let μ : Measure (ℝ × ℝ) := crossBoundaryBaseMeasure u
+  letI : SFinite μ := by
+    dsimp [μ, crossBoundaryBaseMeasure]
+    infer_instance
   have hk : Integrable (crossBoundaryIntegrand h k) μ :=
     crossBoundaryIntegrand_integrable_base h k hu
   have hk1 : Integrable (crossBoundaryIntegrand h (k + 1)) μ :=
@@ -108,7 +94,10 @@ theorem integral_crossBoundaryKGramIntegrand
     ∫ P, crossBoundaryKGramIntegrand h k P
         ∂((crossBoundaryBaseMeasure u).prod (crossBoundaryBaseMeasure u)) =
       2 * (K h k u * K h (k + 2) u - (K h (k + 1) u) ^ 2) := by
-  let μ := crossBoundaryBaseMeasure u
+  let μ : Measure (ℝ × ℝ) := crossBoundaryBaseMeasure u
+  letI : SFinite μ := by
+    dsimp [μ, crossBoundaryBaseMeasure]
+    infer_instance
   have hk : Integrable (crossBoundaryIntegrand h k) μ :=
     crossBoundaryIntegrand_integrable_base h k hu
   have hk1 : Integrable (crossBoundaryIntegrand h (k + 1)) μ :=
@@ -127,6 +116,14 @@ theorem integral_crossBoundaryKGramIntegrand
       (fun P : (ℝ × ℝ) × (ℝ × ℝ) ↦
         crossBoundaryIntegrand h (k + 1) P.1 * crossBoundaryIntegrand h (k + 1) P.2)
       (μ.prod μ) := hk1.mul_prod hk1
+  have hkInt : ∫ p, crossBoundaryIntegrand h k p ∂μ = K h k u := by
+    simpa [μ, crossBoundaryBaseMeasure] using (K_eq_crossBoundaryIntegral h k hu).symm
+  have hk1Int : ∫ p, crossBoundaryIntegrand h (k + 1) p ∂μ = K h (k + 1) u := by
+    simpa [μ, crossBoundaryBaseMeasure] using
+      (K_eq_crossBoundaryIntegral h (k + 1) hu).symm
+  have hk2Int : ∫ p, crossBoundaryIntegrand h (k + 2) p ∂μ = K h (k + 2) u := by
+    simpa [μ, crossBoundaryBaseMeasure] using
+      (K_eq_crossBoundaryIntegral h (k + 2) hu).symm
   have hlinInt :
       ∫ P, crossBoundaryKGramLinear h k P ∂(μ.prod μ) =
         2 * (K h k u * K h (k + 2) u - (K h (k + 1) u) ^ 2) := by
@@ -160,16 +157,8 @@ theorem integral_crossBoundaryKGramIntegrand
       _ =
           K h k u * K h (k + 2) u + K h (k + 2) u * K h k u -
             (K h (k + 1) u * K h (k + 1) u + K h (k + 1) u * K h (k + 1) u) := by
-          simp only [integral_prod_mul]
-          have hkInt : ∫ p, crossBoundaryIntegrand h k p ∂μ = K h k u := by
-            simpa [μ, crossBoundaryBaseMeasure] using (K_eq_crossBoundaryIntegral h k hu).symm
-          have hk1Int : ∫ p, crossBoundaryIntegrand h (k + 1) p ∂μ = K h (k + 1) u := by
-            simpa [μ, crossBoundaryBaseMeasure] using
-              (K_eq_crossBoundaryIntegral h (k + 1) hu).symm
-          have hk2Int : ∫ p, crossBoundaryIntegrand h (k + 2) p ∂μ = K h (k + 2) u := by
-            simpa [μ, crossBoundaryBaseMeasure] using
-              (K_eq_crossBoundaryIntegral h (k + 2) hu).symm
-          rw [hkInt, hk1Int, hk2Int]
+          rw [integral_prod_mul, integral_prod_mul, integral_prod_mul, integral_prod_mul,
+            hkInt, hk1Int, hk2Int]
       _ = 2 * (K h k u * K h (k + 2) u - (K h (k + 1) u) ^ 2) := by ring
   have hrect : ∀ᵐ p ∂μ, p ∈ Ioc (0 : ℝ) u ×ˢ Ioi u := by
     simpa [μ] using ae_mem_crossBoundaryRect u
@@ -199,6 +188,9 @@ lemma integral_crossBoundaryKGramIntegrand_pos
   let μL : Measure ℝ := volume.restrict (Ioc (0 : ℝ) u)
   let μR : Measure ℝ := volume.restrict (Ioi u)
   let μ : Measure (ℝ × ℝ) := μL.prod μR
+  letI : SFinite μ := by
+    dsimp [μ, μL, μR]
+    infer_instance
   let A : Set ℝ := Function.support (h : ℝ → ℝ) ∩ Ioc (u / 4) (u / 3)
   let B : Set ℝ := Function.support (h : ℝ → ℝ) ∩ Ioc (2 * u / 3) (3 * u / 4)
   let C : Set ℝ := Function.support (h : ℝ → ℝ) ∩ Ioc (2 * u) (5 * u / 2)
@@ -234,6 +226,7 @@ lemma integral_crossBoundaryKGramIntegrand_pos
     rw [Measure.restrict_apply' measurableSet_Ioi]
     have hsub : Function.support (h : ℝ → ℝ) ∩ Ioc (2 * u) (5 * u / 2) ⊆ Ioi u := by
       intro z hz
+      change u < z
       nlinarith [hz.2.1, hu]
     rw [inter_eq_left.2 hsub]
     exact hCvol
