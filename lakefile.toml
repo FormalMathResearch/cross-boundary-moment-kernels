@@ -1,6 +1,6 @@
 name = "cross_boundary_moment_kernels"
 version = "0.1.0"
-defaultTargets = ["CrossBoundaryMomentKernels"]
+defaultTargets = ["CrossBoundaryMomentKernels", "Cross_boundary_moment_kernels"]
 
 [leanOptions]
 autoImplicit = false
@@ -12,3 +12,6 @@ rev = "v4.32.1"
 
 [[lean_lib]]
 name = "CrossBoundaryMomentKernels"
+
+[[lean_lib]]
+name = "Cross_boundary_moment_kernels"
