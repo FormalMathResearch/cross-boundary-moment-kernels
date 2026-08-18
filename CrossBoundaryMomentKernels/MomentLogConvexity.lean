@@ -248,4 +248,14 @@ theorem strict_moment_logConvexity_and_gamma_lt
 
   exact ⟨hlogconv, hratio⟩
 
+/-- The strict Hankel-minor inequality from manuscript Lemma 3.1. -/
+theorem strict_moment_logConvexity (h : FullSupportMomentWeight) (k : ℕ) :
+    (I h (k + 1)) ^ 2 < I h k * I h (k + 2) :=
+  (strict_moment_logConvexity_and_gamma_lt h k).1
+
+/-- The consecutive-moment ratios are strictly increasing, as concluded in manuscript Lemma 3.1. -/
+theorem gamma_lt_succ (h : FullSupportMomentWeight) (k : ℕ) :
+    gamma h k < gamma h (k + 1) :=
+  (strict_moment_logConvexity_and_gamma_lt h k).2
+
 end CrossBoundaryMomentKernels
