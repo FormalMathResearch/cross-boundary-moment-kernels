@@ -1,8 +1,10 @@
 import CrossBoundaryMomentKernels.OneCrossingSigns
+import Mathlib.MeasureTheory.Integral.IntervalIntegral.LebesgueDifferentiationThm
 
 noncomputable section
 
 open MeasureTheory Set Filter
+open scoped Topology
 
 namespace CrossBoundaryMomentKernels
 
@@ -41,7 +43,7 @@ lemma R_eq_intervalIntegral_positiveRDerivative
       exact (positiveRDerivative_eq h k hx.1).symm
 
 /-- Absolute continuity is invariant under changing a function pointwise on the underlying interval. -/
-lemma AbsolutelyContinuousOnInterval.congr_eqOn
+lemma absolutelyContinuousOnInterval_congr_eqOn
     {f g : ℝ → ℝ} {a b : ℝ} (hf : AbsolutelyContinuousOnInterval f a b)
     (hfg : EqOn f g (uIcc a b)) :
     AbsolutelyContinuousOnInterval g a b := by
@@ -72,7 +74,7 @@ theorem R_absolutelyContinuousOnInterval
   have hprim :
       AbsolutelyContinuousOnInterval
         (fun x ↦ ∫ t in (0 : ℝ)..x, positiveRDerivative h k t) (0 : ℝ) b :=
-    hdInt.absolutelyContinuousOnInterval_intervalIntegral (by simp [uIcc_of_le hb])
+    hdInt.absolutelyContinuousOnInterval_intervalIntegral (left_mem_Icc.2 hb)
   have hsubset : uIcc a b ⊆ uIcc (0 : ℝ) b := by
     rw [uIcc_of_le hab, uIcc_of_le hb]
     intro x hx
@@ -81,7 +83,7 @@ theorem R_absolutelyContinuousOnInterval
       AbsolutelyContinuousOnInterval
         (fun x ↦ ∫ t in (0 : ℝ)..x, positiveRDerivative h k t) a b :=
     hprim.mono hsubset
-  apply hprim_ab.congr_eqOn
+  apply absolutelyContinuousOnInterval_congr_eqOn hprim_ab
   intro x hx
   rw [uIcc_of_le hab] at hx
   exact (R_eq_intervalIntegral_positiveRDerivative h k (lt_of_lt_of_le ha hx.1)).symm
@@ -93,7 +95,7 @@ theorem R_ae_hasDerivAt
     ∀ᵐ x, 0 < x → HasDerivAt (R h k) (rDerivativeIntegrand h k x) x := by
   have hloc : LocallyIntegrable (positiveRDerivative h k) volume :=
     (positiveRDerivative_integrable h k).locallyIntegrable
-  filter_upwards [hloc.ae_hasDerivAt_integral] with x hx
+  filter_upwards [LocallyIntegrable.ae_hasDerivAt_integral hloc] with x hx
   intro hxpos
   have hprim :
       HasDerivAt (fun y ↦ ∫ t in (0 : ℝ)..y, positiveRDerivative h k t)
@@ -104,6 +106,7 @@ theorem R_ae_hasDerivAt
     filter_upwards [Ioi_mem_nhds hxpos] with y hy
     exact R_eq_intervalIntegral_positiveRDerivative h k hy
   have hR := hprim.congr_of_eventuallyEq heq
-  simpa [positiveRDerivative_eq h k hxpos] using hR
+  rw [positiveRDerivative_eq h k hxpos] at hR
+  exact hR
 
 end CrossBoundaryMomentKernels
