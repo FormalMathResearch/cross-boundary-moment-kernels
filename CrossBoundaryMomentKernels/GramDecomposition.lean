@@ -97,7 +97,13 @@ lemma truncatedGramIntegrand_integrable
       (fun p : ℝ × ℝ ↦ momentIntegrand h (j + 1) p.1 * momentIntegrand h (j + 1) p.2)
       (μ.prod μ) := hj₁.mul_prod hj₁
   have hlin : Integrable (truncatedGramLinearIntegrand h j) (μ.prod μ) := by
-    rw [truncatedGramLinearIntegrand]
+    change Integrable
+      (fun p : ℝ × ℝ ↦
+        momentIntegrand h j p.1 * momentIntegrand h (j + 2) p.2 +
+          momentIntegrand h (j + 2) p.1 * momentIntegrand h j p.2 -
+            (momentIntegrand h (j + 1) p.1 * momentIntegrand h (j + 1) p.2 +
+              momentIntegrand h (j + 1) p.1 * momentIntegrand h (j + 1) p.2))
+      (μ.prod μ)
     exact (ht₁.add ht₂).sub (ht₃.add ht₃)
   have hquadrant : ∀ᵐ p ∂(μ.prod μ), p ∈ Ioi (0 : ℝ) ×ˢ Ioi (0 : ℝ) := by
     refine (Measure.ae_prod_mem_iff_ae_ae_mem
@@ -150,7 +156,14 @@ theorem integral_truncatedGramIntegrand
               momentIntegrand h (j + 1) p.1 * momentIntegrand h (j + 1) p.2 +
                 momentIntegrand h (j + 1) p.1 * momentIntegrand h (j + 1) p.2
               ∂(μ.prod μ) := by
-            rw [truncatedGramLinearIntegrand, integral_sub (ht₁.add ht₂) (ht₃.add ht₃)]
+            change
+              (∫ p,
+                (momentIntegrand h j p.1 * momentIntegrand h (j + 2) p.2 +
+                  momentIntegrand h (j + 2) p.1 * momentIntegrand h j p.2) -
+                  (momentIntegrand h (j + 1) p.1 * momentIntegrand h (j + 1) p.2 +
+                    momentIntegrand h (j + 1) p.1 * momentIntegrand h (j + 1) p.2)
+                ∂(μ.prod μ)) = _
+            exact integral_sub (ht₁.add ht₂) (ht₃.add ht₃)
       _ =
           ((∫ p, momentIntegrand h j p.1 * momentIntegrand h (j + 2) p.2 ∂(μ.prod μ)) +
             (∫ p, momentIntegrand h (j + 2) p.1 * momentIntegrand h j p.2 ∂(μ.prod μ))) -
@@ -294,7 +307,10 @@ theorem truncatedVar_pos
   have hdet :
       0 < J h (k + 1) u * J h (k + 3) u - (J h (k + 2) u) ^ 2 := by
     have hlog := strict_truncated_moment_logConvexity h (k + 1) hu
-    convert sub_pos.mpr hlog using 1 <;> omega
+    have hk2 : k + 1 + 1 = k + 2 := by omega
+    have hk3 : k + 1 + 2 = k + 3 := by omega
+    rw [hk2, hk3] at hlog
+    exact sub_pos.mpr hlog
   have hJ : 0 < J h (k + 1) u := J_pos h (k + 1) hu
   rw [truncatedVar_eq_hankel_ratio h k hu]
   exact div_pos hdet (sq_pos_of_pos hJ)
