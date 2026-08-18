@@ -11,3 +11,4 @@ import CrossBoundaryMomentKernels.OneCrossingGeometry
 import CrossBoundaryMomentKernels.OneCrossingManuscriptForm
 import CrossBoundaryMomentKernels.TotalPositivity
 import CrossBoundaryMomentKernels.TotalPositivityRatio
+import CrossBoundaryMomentKernels.TotalPositivityAdjacent
