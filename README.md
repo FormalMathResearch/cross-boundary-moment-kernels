@@ -41,7 +41,7 @@ The planned formalization covers, in particular:
 
 ## Formalization status
 
-**Stage 6: five manuscript result blocks verified.** The project contains the manuscript-level definitions of the half-integer moments, full-support moment weights, the cross-boundary determinant, the canonical normalization, and the two crossing kernels.
+**Stage 7: six manuscript result blocks verified.** The project contains the manuscript-level definitions of the half-integer moments, full-support moment weights, the cross-boundary determinant, the canonical normalization, the two crossing kernels, and the cross-boundary probability laws.
 
 The following manuscript results have complete end-to-end Lean proofs and have passed `lake build --wfail` together with `leanchecker`:
 
@@ -75,12 +75,37 @@ The following manuscript results have complete end-to-end Lean proofs and have p
   =\frac12\int_0^u\int_0^u
   (yz)^{k+1/2}(y-z)^2h(y)h(z)\,dy\,dz.
   \]
+- **Theorem 2.2(vi) — multiplicative size-bias hierarchy:** for every \(k\ge0\) and \(u>0\), the manuscript density
+  \[
+  d\nu_{k,u}(y,z)=\frac{(yz)^{k-1/2}(z-y)h(y)h(z)}{K_k(u)}\,dy\,dz,
+  \qquad 0<y\le u<z,
+  \]
+  is formalized as an actual probability measure. For \(X=YZ\), Lean proves for every integer \(m\ge0\)
+  \[
+  \mathbb E_{k,u}[X^m]=\frac{K_{k+m}(u)}{K_k(u)},
+  \]
+  and the exact Radon--Nikodym size-bias identity
+  \[
+  d\nu_{k+1,u}=\frac{X}{\mathbb E_{k,u}X}\,d\nu_{k,u}.
+  \]
+  Writing \(M_k(u)=\mathbb E_{k,u}X=K_{k+1}(u)/K_k(u)\), the formalization establishes \(X\in L^2(\nu_{k,u})\), identifies the genuine `ProbabilityTheory.variance`, and proves
+  \[
+  M_{k+1}(u)-M_k(u)
+  =\frac{\operatorname{Var}_{k,u}(X)}{M_k(u)}>0.
+  \]
 
 The one-crossing development also kernel-checks the integrated derivative law and the exact upper-tail identity for `R_k`. These replace the informal endpoint-limit passages inside the Lean proof while preserving the manuscript statement and hypotheses. The three monotonicity phases are made strict directly from the manuscript full-support condition, not from a stronger assumption that `h` is pointwise positive everywhere.
 
 Likewise, the strict-TP2 development uses exact lower-primitive, difference, and upper-tail identities for `Z_k`. The lower and upper ratio zones are proved by strict gap integrals supported on positive-measure subintervals supplied by the manuscript full-support hypothesis; no stronger pointwise positivity or smoothness assumption on `h` is introduced.
 
 For the truncated Gram block, strictness is again obtained from the manuscript full-support hypothesis. The formal proof places two disjoint positive-measure support slices inside `(0,u)` and uses their product rectangle to force the symmetrized square integrand to have positive integral. No pointwise positivity or additional regularity assumption on `h` is introduced.
+
+For the multiplicative size-bias block, strict variance positivity is likewise proved without pointwise positivity of `h`. A two-copy Gram identity gives
+\[
+K_k(u)K_{k+2}(u)-K_{k+1}(u)^2
+=\frac12\iint f_k(p)f_k(q)\bigl(X(p)-X(q)\bigr)^2\,d\mu(p)\,d\mu(q)>0,
+\]
+and full support supplies two positive-measure cross-boundary rectangles on which the product variable `X = YZ` has separated ranges. This proves non-degeneracy and the strict variance drift using exactly the manuscript support hypothesis.
 
 All headline proofs retain the mathematical argument through local `have` and `calc` blocks. The verified proofs contain no `sorry` placeholders.
 
@@ -117,6 +142,11 @@ GitHub Actions builds with warnings treated as failures and runs `leanchecker` o
 - `CrossBoundaryMomentKernels/TotalPositivityHierarchy.lean` — iteration to arbitrary index pairs and the strict TP2 determinant theorem;
 - `CrossBoundaryMomentKernels/GramDecomposition.lean` — positivity of truncated moments, strict truncated Hankel log-convexity, the factorized Gram square, and the exact Gram-plus-transport identity;
 - `CrossBoundaryMomentKernels/GramManuscriptForm.lean` — manuscript-exact `(yz)^{k+1/2}(y-z)^2h(y)h(z)` integrand and iterated double-integral form;
+- `CrossBoundaryMomentKernels/SizeBias.lean` — the cross-boundary base measure and probability density, normalization, general `X^m` moment identity, and mean formula;
+- `CrossBoundaryMomentKernels/SizeBiasShift.lean` — exact multiplicative Radon--Nikodym size-bias step from index `k` to `k+1`;
+- `CrossBoundaryMomentKernels/CrossBoundaryKGram.lean` — two-copy Gram identity and strict index log-convexity of the cross-boundary `K` hierarchy;
+- `CrossBoundaryMomentKernels/SizeBiasVariance.lean` — `L²` integrability, genuine probabilistic variance, strict variance positivity, and the mean drift formula;
+- `CrossBoundaryMomentKernels/SizeBiasManuscriptForm.lean` — exact identification of the formal probability law with the density printed in Theorem 2.2(vi);
 - `.github/workflows/ci.yml` — Lean/mathlib CI build and kernel checking;
 - `lakefile.toml` and `lean-toolchain` — reproducible project configuration.
 
