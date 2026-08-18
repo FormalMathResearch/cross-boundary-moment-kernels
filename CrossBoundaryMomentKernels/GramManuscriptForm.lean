@@ -20,7 +20,12 @@ lemma truncatedGramIntegrand_eq_manuscript
     simp [halfExponent]
     ring
   rw [truncatedGramIntegrand, momentIntegrand, momentIntegrand, hexp,
-    truncatedGramManuscriptIntegrand, Real.mul_rpow hy.le hz.le]
+    truncatedGramManuscriptIntegrand]
+  change
+    (y ^ ((k : ℝ) + (1 / 2 : ℝ)) * h y) *
+          (z ^ ((k : ℝ) + (1 / 2 : ℝ)) * h z) * (y - z) ^ 2 =
+      (y * z) ^ ((k : ℝ) + (1 / 2 : ℝ)) * (y - z) ^ 2 * h y * h z
+  rw [Real.mul_rpow hy.le hz.le]
   ring
 
 /-- Manuscript-exact iterated double-integral representation of the truncated Hankel minor. -/
