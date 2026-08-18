@@ -129,9 +129,9 @@ theorem strict_moment_logConvexity_and_gamma_lt
     have hz₁ : momentIntegrand h (k + 1) z = z * momentIntegrand h k z :=
       momentIntegrand_succ h k hz
     have hy₂ : momentIntegrand h (k + 2) y = y * momentIntegrand h (k + 1) y := by
-      convert momentIntegrand_succ h (k + 1) hy using 1 <;> omega
+      convert momentIntegrand_succ h (k + 1) hy using 1
     have hz₂ : momentIntegrand h (k + 2) z = z * momentIntegrand h (k + 1) z := by
-      convert momentIntegrand_succ h (k + 1) hz using 1 <;> omega
+      convert momentIntegrand_succ h (k + 1) hz using 1
     dsimp [G]
     rw [hy₂, hz₂, hy₁, hz₁]
     ring
@@ -227,7 +227,7 @@ theorem strict_moment_logConvexity_and_gamma_lt
         0 < momentIntegrand h k p.1 * momentIntegrand h k p.2 * (p.1 - p.2) ^ 2 :=
       mul_pos (mul_pos hfy_pos hfz_pos) hsq_pos
     show G p ≠ 0
-    rw [show p = (p.1, p.2) by cases p <;> rfl, hG_square p.1 p.2 hy_pos hz_pos]
+    rw [show p = (p.1, p.2) by cases p; rfl, hG_square p.1 p.2 hy_pos hz_pos]
     exact ne_of_gt hprod_pos
 
   have hG_support_pos : 0 < (μ.prod μ) (Function.support G) :=
