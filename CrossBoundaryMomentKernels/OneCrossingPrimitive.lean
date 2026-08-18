@@ -36,6 +36,11 @@ lemma R_eq_setIntegral_rLinearIntegrand
   have ht₂ : Integrable
       (fun x ↦ (tau h k * I h k + I h (k + 2)) * momentIntegrand h (k + 1) x) μ :=
     hk₁.const_mul _
+  have ht₀₁ : Integrable
+      (fun x ↦
+        tau h k * I h (k + 1) * momentIntegrand h k x +
+          I h (k + 1) * momentIntegrand h (k + 2) x) μ := by
+    exact ht₀.add ht₁
   have hIntegral :
       (∫ x, rLinearIntegrand h k x ∂μ) =
         2 *
@@ -48,8 +53,7 @@ lemma R_eq_setIntegral_rLinearIntegrand
           (tau h k * I h (k + 1) * momentIntegrand h k x +
             I h (k + 1) * momentIntegrand h (k + 2) x -
             (tau h k * I h k + I h (k + 2)) * momentIntegrand h (k + 1) x) ∂μ) = _
-    rw [integral_const_mul,
-      integral_sub (ht₀.add ht₁) ht₂, integral_add ht₀ ht₁]
+    rw [integral_const_mul, integral_sub ht₀₁ ht₂, integral_add ht₀ ht₁]
     simp only [integral_const_mul]
     simp [J, μ]
   have hAlgebra :
@@ -101,6 +105,12 @@ lemma integral_rDerivativeIntegrand_Ioi_eq_zero
       (fun x ↦ (tau h k * I h k + I h (k + 2)) * momentIntegrand h (k + 1) x)
       (volume.restrict (Ioi (0 : ℝ))) :=
     hk₁.const_mul _
+  have ht₀₁ : Integrable
+      (fun x ↦
+        tau h k * I h (k + 1) * momentIntegrand h k x +
+          I h (k + 1) * momentIntegrand h (k + 2) x)
+      (volume.restrict (Ioi (0 : ℝ))) := by
+    exact ht₀.add ht₁
   have hlinear :
       ∫ x, rLinearIntegrand h k x ∂(volume.restrict (Ioi (0 : ℝ))) = 0 := by
     change
@@ -110,8 +120,7 @@ lemma integral_rDerivativeIntegrand_Ioi_eq_zero
             I h (k + 1) * momentIntegrand h (k + 2) x -
             (tau h k * I h k + I h (k + 2)) * momentIntegrand h (k + 1) x)
           ∂(volume.restrict (Ioi (0 : ℝ)))) = 0
-    rw [integral_const_mul,
-      integral_sub (ht₀.add ht₁) ht₂, integral_add ht₀ ht₁]
+    rw [integral_const_mul, integral_sub ht₀₁ ht₂, integral_add ht₀ ht₁]
     simp only [integral_const_mul]
     simp [I]
     ring
