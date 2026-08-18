@@ -33,7 +33,7 @@ strengthening or weakening them.
 structure FullSupportMomentWeight where
   toFun : ℝ → ℝ
   measurable_toFun : Measurable toFun
-  nonneg : ∀ y : ℝ, 0 ≤ toFun y
+  nonneg : ∀ ⦃y : ℝ⦄, 0 < y → 0 ≤ toFun y
   fullSupport : ∀ ⦃a b : ℝ⦄, 0 < a → a < b →
     0 < ∫ y, toFun y ∂(volume.restrict (Set.Ioc a b))
   momentIntegrable : ∀ j : ℕ,
