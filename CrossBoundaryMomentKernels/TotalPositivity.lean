@@ -120,7 +120,9 @@ lemma integral_zDerivativeIntegrand_Ioi_eq_zero
         (I h (k + 1) * momentIntegrand h k x - I h k * momentIntegrand h (k + 1) x)
         ∂(volume.restrict (Ioi (0 : ℝ)))) = 0
     rw [integral_const_mul, integral_sub ht₀ ht₁]
-    all_goals simp [I, mul_comm]
+    simp only [integral_const_mul]
+    change (N h k)⁻¹ * (I h (k + 1) * I h k - I h k * I h (k + 1)) = 0
+    ring
   calc
     ∫ x, zDerivativeIntegrand h k x ∂(volume.restrict (Ioi (0 : ℝ))) =
         ∫ x, zLinearIntegrand h k x ∂(volume.restrict (Ioi (0 : ℝ))) := by
