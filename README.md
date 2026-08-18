@@ -41,7 +41,7 @@ The planned formalization covers, in particular:
 
 ## Formalization status
 
-**Stage 3: two manuscript results verified.** The project contains the manuscript-level definitions of the half-integer moments, full-support moment weights, the cross-boundary determinant, the canonical normalization, and the two crossing kernels.
+**Stage 4: three manuscript result blocks verified.** The project contains the manuscript-level definitions of the half-integer moments, full-support moment weights, the cross-boundary determinant, the canonical normalization, and the two crossing kernels.
 
 The following manuscript results have complete end-to-end Lean proofs and have passed `lake build --wfail` together with `leanchecker`:
 
@@ -49,8 +49,15 @@ The following manuscript results have complete end-to-end Lean proofs and have p
   \(I_{k+1}^2 < I_k I_{k+2}\) for every \(k \ge 0\), together with the strict increase of \(\gamma_k = I_{k+1}/I_k\).
 - **Theorem 2.2(i) — positive cross-boundary representation:** for every \(u>0\), `K_k(u)` is represented by the cross-boundary integral over \(0<y\le u<z\), and \(K_k(u)>0\). The repository also proves the manuscript-exact integrand identity
   \((yz)^{k-1/2}(z-y)h(y)h(z)\) and the corresponding iterated-integral formula.
+- **Theorem 2.2(ii)–(iii) — quadratic derivative law and universal one-crossing geometry:** for every manuscript index \(k\ge1\), the derivative quadratic has strictly positive discriminant and two distinct positive roots \(0<\xi_{k,-}<\xi_{k,+}\). The crossing kernel `R_k` is locally absolutely continuous on the positive half-line and satisfies, almost everywhere,
+  \[
+  R_k'(x)=2I_{k+1}x^{k-1/2}h(x)Q_k(x).
+  \]
+  There is a unique positive zero \(u_k^*\in(\xi_{k,-},\xi_{k,+})\); both `R_k` and the normalized kernel `Rhat_k` are strictly positive before \(u_k^*\) and strictly negative after it.
 
-Both headline proofs retain the mathematical argument through local `have` and `calc` blocks. Strictness is derived from the manuscript's full-support hypothesis rather than from a stronger pointwise-positivity assumption. The verified proofs contain no `sorry` placeholders.
+The one-crossing development also kernel-checks the integrated derivative law and the exact upper-tail identity for `R_k`. These replace the informal endpoint-limit passages inside the Lean proof while preserving the manuscript statement and hypotheses. The three monotonicity phases are made strict directly from the manuscript full-support condition, not from a stronger assumption that `h` is pointwise positive everywhere.
+
+All headline proofs retain the mathematical argument through local `have` and `calc` blocks. The verified proofs contain no `sorry` placeholders.
 
 No other mathematical theorem in the manuscript should be regarded as Lean-verified until its corresponding proof has been completed and CI has passed. Verification status is recorded theorem by theorem as the development progresses.
 
@@ -72,6 +79,13 @@ GitHub Actions builds with warnings treated as failures and runs `leanchecker` o
 - `CrossBoundaryMomentKernels/MomentLogConvexity.lean` — manuscript Lemma 3.1 and its supporting identities;
 - `CrossBoundaryMomentKernels/CrossBoundaryRepresentation.lean` — end-to-end proof of Theorem 2.2(i) in a robust factorized form;
 - `CrossBoundaryMomentKernels/CrossBoundaryManuscriptForm.lean` — exact translation to the integrand and iterated-integral notation printed in the manuscript;
+- `CrossBoundaryMomentKernels/OneCrossing.lean` — the crossing quadratic, discriminant, roots, and their sign geometry;
+- `CrossBoundaryMomentKernels/OneCrossingAnalysis.lean` — integrable derivative-density normal form;
+- `CrossBoundaryMomentKernels/OneCrossingPrimitive.lean` — integrated derivative, difference, and upper-tail identities;
+- `CrossBoundaryMomentKernels/OneCrossingSigns.lean` — strict derivative-integral signs and the three strict monotonicity phases;
+- `CrossBoundaryMomentKernels/OneCrossingRegularity.lean` — local absolute continuity and the a.e. derivative law;
+- `CrossBoundaryMomentKernels/OneCrossingGeometry.lean` — unique canonical crossing and global sign pattern;
+- `CrossBoundaryMomentKernels/OneCrossingManuscriptForm.lean` — manuscript-exact a.e. derivative statement;
 - `.github/workflows/ci.yml` — Lean/mathlib CI build and kernel checking;
 - `lakefile.toml` and `lean-toolchain` — reproducible project configuration.
 
