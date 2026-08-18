@@ -15,9 +15,14 @@ printed in Theorem 2.2(i). -/
 lemma crossBoundaryIntegrand_eq_manuscript
     (h : ℝ → ℝ) (k : ℕ) {y z : ℝ} (hy : 0 < y) (hz : 0 < z) :
     crossBoundaryIntegrand h k (y, z) = manuscriptCrossBoundaryIntegrand h k (y, z) := by
-  rw [crossBoundaryIntegrand, manuscriptCrossBoundaryIntegrand, momentIntegrand, momentIntegrand]
-  rw [← Real.mul_rpow hy.le hz.le]
-  ring
+  change
+    (y ^ halfExponent k * h y) * (z ^ halfExponent k * h z) * (z - y) =
+      (y * z) ^ halfExponent k * (z - y) * h y * h z
+  calc
+    (y ^ halfExponent k * h y) * (z ^ halfExponent k * h z) * (z - y) =
+        (y ^ halfExponent k * z ^ halfExponent k) * (z - y) * h y * h z := by ring
+    _ = (y * z) ^ halfExponent k * (z - y) * h y * h z := by
+      rw [← Real.mul_rpow hy.le hz.le]
 
 /-- Manuscript-exact iterated-integral statement of Theorem 2.2(i). -/
 theorem K_eq_manuscriptCrossBoundaryIntegral
