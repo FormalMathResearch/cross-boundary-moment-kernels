@@ -41,14 +41,16 @@ The planned formalization covers, in particular:
 
 ## Formalization status
 
-**Stage 2: first manuscript theorem verified.** The project contains the manuscript-level definitions of the half-integer moments, full-support moment weights, the cross-boundary determinant, the canonical normalization, and the two crossing kernels.
+**Stage 3: two manuscript results verified.** The project contains the manuscript-level definitions of the half-integer moments, full-support moment weights, the cross-boundary determinant, the canonical normalization, and the two crossing kernels.
 
-The following manuscript result has been formalized by a complete end-to-end Lean proof and has passed `lake build --wfail` together with `leanchecker`:
+The following manuscript results have complete end-to-end Lean proofs and have passed `lake build --wfail` together with `leanchecker`:
 
 - **Lemma 3.1 — strict moment log-convexity:**
   \(I_{k+1}^2 < I_k I_{k+2}\) for every \(k \ge 0\), together with the strict increase of \(\gamma_k = I_{k+1}/I_k\).
+- **Theorem 2.2(i) — positive cross-boundary representation:** for every \(u>0\), `K_k(u)` is represented by the cross-boundary integral over \(0<y\le u<z\), and \(K_k(u)>0\). The repository also proves the manuscript-exact integrand identity
+  \((yz)^{k-1/2}(z-y)h(y)h(z)\) and the corresponding iterated-integral formula.
 
-The proof retains the manuscript's symmetrization argument, makes the strictness step from full support explicit, and contains no `sorry` placeholders.
+Both headline proofs retain the mathematical argument through local `have` and `calc` blocks. Strictness is derived from the manuscript's full-support hypothesis rather than from a stronger pointwise-positivity assumption. The verified proofs contain no `sorry` placeholders.
 
 No other mathematical theorem in the manuscript should be regarded as Lean-verified until its corresponding proof has been completed and CI has passed. Verification status is recorded theorem by theorem as the development progresses.
 
@@ -68,6 +70,8 @@ GitHub Actions builds with warnings treated as failures and runs `leanchecker` o
 - `CrossBoundaryMomentKernels.lean` — root library module;
 - `CrossBoundaryMomentKernels/Basic.lean` — basic moment-weight and kernel definitions;
 - `CrossBoundaryMomentKernels/MomentLogConvexity.lean` — manuscript Lemma 3.1 and its supporting identities;
+- `CrossBoundaryMomentKernels/CrossBoundaryRepresentation.lean` — end-to-end proof of Theorem 2.2(i) in a robust factorized form;
+- `CrossBoundaryMomentKernels/CrossBoundaryManuscriptForm.lean` — exact translation to the integrand and iterated-integral notation printed in the manuscript;
 - `.github/workflows/ci.yml` — Lean/mathlib CI build and kernel checking;
 - `lakefile.toml` and `lean-toolchain` — reproducible project configuration.
 
