@@ -20,8 +20,9 @@ lemma halfExponent_succ (j : ℕ) :
 multiplying the `j`-th moment integrand by the integration variable. -/
 lemma momentIntegrand_succ (h : ℝ → ℝ) (j : ℕ) {y : ℝ} (hy : 0 < y) :
     momentIntegrand h (j + 1) y = y * momentIntegrand h j y := by
-  rw [momentIntegrand, momentIntegrand, halfExponent_succ,
-    Real.rpow_add_one hy.ne' (halfExponent j)]
+  rw [momentIntegrand, momentIntegrand, halfExponent_succ]
+  change (y ^ (halfExponent j + 1)) * h y = y * (y ^ halfExponent j * h y)
+  rw [Real.rpow_add hy (halfExponent j) 1, Real.rpow_one]
   ring
 
 /-- Every consecutive-moment ratio is strictly positive for a full-support moment weight. -/
