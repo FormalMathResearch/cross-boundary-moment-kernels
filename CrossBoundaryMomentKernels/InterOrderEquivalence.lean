@@ -132,13 +132,22 @@ theorem R_succ_uStar_pos_iff_variance_lt_reserve
   constructor
   · intro hmean
     rw [hvar]
-    exact mul_lt_mul_of_pos_left (sub_lt_sub_right hmean (tau h k)) htau
+    have hgap :
+        0 < tau h k *
+          (tau h (k + 1) - crossBoundaryMean h (k + 1) (uStar h k)) :=
+      mul_pos htau (sub_pos.mpr hmean)
+    nlinarith
   · intro hvarlt
     rw [hvar] at hvarlt
-    have hdiff :
-        crossBoundaryMean h (k + 1) (uStar h k) - tau h k <
-          tau h (k + 1) - tau h k :=
-      (mul_lt_mul_left htau).mp hvarlt
+    have hgap :
+        0 < tau h k *
+          ((tau h (k + 1) - tau h k) -
+            (crossBoundaryMean h (k + 1) (uStar h k) - tau h k)) := by
+      nlinarith
+    have hinner :
+        0 < (tau h (k + 1) - tau h k) -
+          (crossBoundaryMean h (k + 1) (uStar h k) - tau h k) :=
+      pos_of_mul_pos_right hgap htau.le
     linarith
 
 /-- Scaling identity for `Λ_k` at the canonical crossing. -/
@@ -150,7 +159,7 @@ lemma Lambda_uStar_mul_tau_sq
   have htau : tau h k ≠ 0 := ne_of_gt (tau_pos h hk)
   rw [Lambda_eq_one_add_variance_div_mean_sq h k hu,
     crossBoundaryMean_uStar_eq_tau h hk]
-  field_simp [htau] <;> ring
+  field_simp [htau]
 
 /-- Scaling identity for the normalization curvature. -/
 lemma Omega_mul_tau_sq
@@ -158,7 +167,7 @@ lemma Omega_mul_tau_sq
     Omega h k * (tau h k) ^ 2 = tau h k * tau h (k + 1) := by
   have htau : tau h k ≠ 0 := ne_of_gt (tau_pos h hk)
   rw [Omega_eq_tau_succ_div_tau h hk]
-  field_simp [htau] <;> ring
+  field_simp [htau]
 
 /-- Manuscript Theorem 2.3, step `(e) ↔ (f)` in its compact curvature form. -/
 theorem variance_lt_reserve_iff_Lambda_lt_Omega
@@ -180,12 +189,20 @@ theorem variance_lt_reserve_iff_Lambda_lt_Omega
           Omega h k * (tau h k) ^ 2 := by
       rw [hL, hO]
       exact hscaled
-    exact (mul_lt_mul_right htau2).mp hmul
+    have hgap :
+        0 < (Omega h k - Lambda h k (uStar h k)) * (tau h k) ^ 2 := by
+      nlinarith
+    have hinner : 0 < Omega h k - Lambda h k (uStar h k) :=
+      pos_of_mul_pos_left hgap htau2.le
+    linarith
   · intro hcurv
+    have hgap :
+        0 < (Omega h k - Lambda h k (uStar h k)) * (tau h k) ^ 2 :=
+      mul_pos (sub_pos.mpr hcurv) htau2
     have hmul :
         Lambda h k (uStar h k) * (tau h k) ^ 2 <
-          Omega h k * (tau h k) ^ 2 :=
-      (mul_lt_mul_right htau2).mpr hcurv
+          Omega h k * (tau h k) ^ 2 := by
+      nlinarith
     rw [hL, hO] at hmul
     nlinarith
 
