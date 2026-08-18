@@ -36,7 +36,6 @@ lemma crossBoundaryProduct_sq_integrable
   have hadd := crossBoundaryIntegrand_add_index h k 2 hp.1.1 hz
   dsimp [f]
   rw [ENNReal.toReal_ofReal hden, crossBoundaryDensity, hadd]
-  simp only [smul_eq_mul]
   ring
 
 /-- The observable `X` belongs to `L²(ν_{k,u})`. -/
@@ -81,7 +80,6 @@ theorem crossBoundaryVariance_pos
       K h (k + 2) u / K h k u - (K h (k + 1) u / K h k u) ^ 2 =
         (K h k u * K h (k + 2) u - (K h (k + 1) u) ^ 2) / (K h k u) ^ 2 := by
     field_simp [ne_of_gt hK]
-    ring
   rw [heq]
   exact div_pos hnum (sq_pos_of_pos hK)
 
@@ -96,7 +94,6 @@ theorem crossBoundaryMean_succ_sub_eq_variance_div_mean
     crossBoundaryMean_eq_K_ratio h k hu,
     crossBoundaryVariance_eq_K h k hu]
   field_simp [hK, hK1]
-  ring
 
 /-- Consecutive cross-boundary means increase strictly. -/
 theorem crossBoundaryMean_strictMono_index
