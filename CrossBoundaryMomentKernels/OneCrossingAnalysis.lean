@@ -54,7 +54,14 @@ lemma rLinearIntegrand_integrable
           (tau h k * I h k + I h (k + 2)) * momentIntegrand h (k + 1) x)
       (volume.restrict (Ioi (0 : ℝ))) := by
     exact (ht₀.add ht₁).sub ht₂
-  simpa [rLinearIntegrand] using hcore.const_mul (2 : ℝ)
+  change Integrable
+    (fun x ↦
+      2 *
+        (tau h k * I h (k + 1) * momentIntegrand h k x +
+          I h (k + 1) * momentIntegrand h (k + 2) x -
+          (tau h k * I h k + I h (k + 2)) * momentIntegrand h (k + 1) x))
+    (volume.restrict (Ioi (0 : ℝ)))
+  exact hcore.const_mul (2 : ℝ)
 
 /-- The manuscript derivative density is integrable on the positive half-line. -/
 lemma rDerivativeIntegrand_integrable
