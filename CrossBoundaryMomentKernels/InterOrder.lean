@@ -31,7 +31,6 @@ theorem R_eq_two_K_mul_tau_sub_mean
   have hK : K h k u ≠ 0 := ne_of_gt (K_pos h k hu)
   rw [R, crossBoundaryMean_eq_K_ratio h k hu]
   field_simp [hK]
-  ring
 
 /-- Positivity of the crossing kernel is equivalent to the mean lying below the global scale. -/
 theorem R_pos_iff_mean_lt_tau
@@ -40,12 +39,12 @@ theorem R_pos_iff_mean_lt_tau
   rw [R_eq_two_K_mul_tau_sub_mean h hk hu]
   have hcoef : 0 < 2 * K h k u := mul_pos (by norm_num) (K_pos h k hu)
   constructor
-  · intro h
-    have hdiff : 0 < tau h k - crossBoundaryMean h k u := by
-      exact (mul_pos_iff.mp h).resolve_left (by linarith)
-    linarith
-  · intro h
-    exact mul_pos hcoef (sub_pos.mpr h)
+  · intro hprod
+    have hdiff : 0 < tau h k - crossBoundaryMean h k u :=
+      pos_of_mul_pos_right hprod hcoef.le
+    exact sub_pos.mp hdiff
+  · intro hlt
+    exact mul_pos hcoef (sub_pos.mpr hlt)
 
 /-- Negativity of the crossing kernel is equivalent to the mean lying above the global scale. -/
 theorem R_neg_iff_tau_lt_mean
@@ -54,14 +53,12 @@ theorem R_neg_iff_tau_lt_mean
   rw [R_eq_two_K_mul_tau_sub_mean h hk hu]
   have hcoef : 0 < 2 * K h k u := mul_pos (by norm_num) (K_pos h k hu)
   constructor
-  · intro h
-    have hdiff : tau h k - crossBoundaryMean h k u < 0 := by
-      by_contra hnot
-      have : 0 ≤ tau h k - crossBoundaryMean h k u := le_of_not_gt hnot
-      exact (not_lt_of_ge (mul_nonneg hcoef.le this)) h
-    linarith
-  · intro h
-    exact mul_neg_of_pos_of_neg hcoef (sub_neg.mpr h)
+  · intro hprod
+    have hdiff : tau h k - crossBoundaryMean h k u < 0 :=
+      neg_of_mul_neg_right hprod hcoef.le
+    exact sub_neg.mp hdiff
+  · intro hlt
+    exact mul_neg_of_pos_of_neg hcoef (sub_neg.mpr hlt)
 
 /-- Zero of the crossing kernel is equivalent to exact mean/scale matching. -/
 theorem R_eq_zero_iff_mean_eq_tau
@@ -70,12 +67,12 @@ theorem R_eq_zero_iff_mean_eq_tau
   rw [R_eq_two_K_mul_tau_sub_mean h hk hu]
   have hcoef : 2 * K h k u ≠ 0 := ne_of_gt (mul_pos (by norm_num) (K_pos h k hu))
   constructor
-  · intro h
+  · intro hprod
     have hdiff : tau h k - crossBoundaryMean h k u = 0 :=
-      (mul_eq_zero.mp h).resolve_left hcoef
-    linarith
-  · intro h
-    simp [h]
+      (mul_eq_zero.mp hprod).resolve_left hcoef
+    exact (sub_eq_zero.mp hdiff).symm
+  · intro heq
+    simp [heq]
 
 /-- The crossing kernel in normalized determinant coordinates. -/
 theorem R_eq_two_N_succ_mul_Z_sub_Z
@@ -85,7 +82,6 @@ theorem R_eq_two_N_succ_mul_Z_sub_Z
   have hNk1 : N h (k + 1) ≠ 0 := ne_of_gt (N_pos h (by omega))
   rw [R, tau, Z, Z]
   field_simp [hNk, hNk1]
-  ring
 
 /-- At the canonical crossing, the multiplicative mean matches `τ_k`. -/
 theorem crossBoundaryMean_uStar_eq_tau
@@ -119,7 +115,6 @@ theorem Lambda_eq_one_add_variance_div_mean_sq
   rw [Lambda, crossBoundaryVariance_eq_K h k hu,
     crossBoundaryMean_eq_K_ratio h k hu]
   field_simp [hK, hK1]
-  ring
 
 /-- Universal strict relative log-convexity of the unnormalized `K` hierarchy. -/
 theorem one_lt_Lambda
@@ -139,7 +134,6 @@ theorem Omega_eq_tau_succ_div_tau
   have hNk2 : N h (k + 2) ≠ 0 := ne_of_gt (N_pos h (by omega))
   rw [Omega, tau, tau]
   field_simp [hNk, hNk1, hNk2]
-  ring
 
 /-- `Ω_k` is positive at every manuscript index. -/
 theorem Omega_pos
@@ -161,6 +155,5 @@ theorem Z_curvature_ratio_eq_Lambda_div_Omega
   have hK2 : K h (k + 2) u ≠ 0 := ne_of_gt (K_pos h (k + 2) hu)
   rw [Z, Z, Z, Lambda, Omega]
   field_simp [hNk, hNk1, hNk2, hK, hK1, hK2]
-  ring
 
 end CrossBoundaryMomentKernels
