@@ -90,12 +90,33 @@ theorem strict_moment_logConvexity_and_gamma_lt
   have hG_integral :
       (∫ p, G p ∂(μ.prod μ)) =
         2 * (I h k * I h (k + 2) - (I h (k + 1)) ^ 2) := by
-    dsimp [G]
-    rw [integral_sub (hterm₁.add hterm₂) (hterm₃.add hterm₃),
-      integral_add hterm₁ hterm₂, integral_add hterm₃ hterm₃,
-      integral_prod_mul, integral_prod_mul, integral_prod_mul, integral_prod_mul]
-    simp only [I, μ]
-    ring
+    calc
+      (∫ p, G p ∂(μ.prod μ)) =
+          ∫ p,
+            ((fun q : ℝ × ℝ ↦
+                momentIntegrand h k q.1 * momentIntegrand h (k + 2) q.2) +
+              (fun q : ℝ × ℝ ↦
+                momentIntegrand h (k + 2) q.1 * momentIntegrand h k q.2) -
+              ((fun q : ℝ × ℝ ↦
+                  momentIntegrand h (k + 1) q.1 * momentIntegrand h (k + 1) q.2) +
+                (fun q : ℝ × ℝ ↦
+                  momentIntegrand h (k + 1) q.1 * momentIntegrand h (k + 1) q.2))) p
+              ∂(μ.prod μ) := by rfl
+      _ =
+          (∫ p, momentIntegrand h k p.1 * momentIntegrand h (k + 2) p.2 ∂(μ.prod μ)) +
+            (∫ p, momentIntegrand h (k + 2) p.1 * momentIntegrand h k p.2 ∂(μ.prod μ)) -
+              ((∫ p, momentIntegrand h (k + 1) p.1 * momentIntegrand h (k + 1) p.2
+                  ∂(μ.prod μ)) +
+                (∫ p, momentIntegrand h (k + 1) p.1 * momentIntegrand h (k + 1) p.2
+                  ∂(μ.prod μ))) := by
+            rw [integral_sub (hterm₁.add hterm₂) (hterm₃.add hterm₃),
+              integral_add hterm₁ hterm₂, integral_add hterm₃ hterm₃]
+      _ =
+          I h k * I h (k + 2) + I h (k + 2) * I h k -
+            (I h (k + 1) * I h (k + 1) + I h (k + 1) * I h (k + 1)) := by
+            rw [integral_prod_mul, integral_prod_mul, integral_prod_mul, integral_prod_mul]
+            rfl
+      _ = 2 * (I h k * I h (k + 2) - (I h (k + 1)) ^ 2) := by ring
 
   have hG_square (y z : ℝ) (hy : 0 < y) (hz : 0 < z) :
       G (y, z) = momentIntegrand h k y * momentIntegrand h k z * (y - z) ^ 2 := by
@@ -116,7 +137,8 @@ theorem strict_moment_logConvexity_and_gamma_lt
     exact ae_restrict_mem measurableSet_Ioi
 
   have hquadrant_ae : ∀ᵐ p ∂(μ.prod μ), p ∈ Ioi (0 : ℝ) ×ˢ Ioi (0 : ℝ) := by
-    refine (ae_prod_mem_iff_ae_ae_mem (measurableSet_Ioi.prod measurableSet_Ioi)).2 ?_
+    refine (Measure.ae_prod_mem_iff_ae_ae_mem
+      (measurableSet_Ioi.prod measurableSet_Ioi)).2 ?_
     filter_upwards [hμ_ae_pos] with y hy
     filter_upwards [hμ_ae_pos] with z hz
     exact ⟨hy, hz⟩
@@ -170,7 +192,7 @@ theorem strict_moment_logConvexity_and_gamma_lt
     rw [Measure.restrict_apply' measurableSet_Ioi]
     have hsub : Function.support (h : ℝ → ℝ) ∩ Ioc (1 : ℝ) 2 ⊆ Ioi (0 : ℝ) := by
       intro y hy
-      linarith [hy.2.1]
+      exact show 0 < y by linarith [hy.2.1]
     rw [inter_eq_left.2 hsub]
     exact hsupp_A_vol
   have hμB : 0 < μ B := by
@@ -178,13 +200,13 @@ theorem strict_moment_logConvexity_and_gamma_lt
     rw [Measure.restrict_apply' measurableSet_Ioi]
     have hsub : Function.support (h : ℝ → ℝ) ∩ Ioc (3 : ℝ) 4 ⊆ Ioi (0 : ℝ) := by
       intro y hy
-      linarith [hy.2.1]
+      exact show 0 < y by linarith [hy.2.1]
     rw [inter_eq_left.2 hsub]
     exact hsupp_B_vol
 
   have hrect_pos : 0 < (μ.prod μ) (A ×ˢ B) := by
-    rw [Measure.prod_prod]
-    exact mul_pos hμA hμB
+    rw [Measure.prod_prod, CanonicallyOrderedAdd.mul_pos]
+    exact ⟨hμA, hμB⟩
 
   have hrect_support : A ×ˢ B ⊆ Function.support G := by
     intro p hp
@@ -196,9 +218,13 @@ theorem strict_moment_logConvexity_and_gamma_lt
     have hyz : p.1 < p.2 := by linarith [hyA.2.2, hzB.2.1]
     have hfy_pos := momentIntegrand_pos_of_mem_support h k hy_pos hyA.1
     have hfz_pos := momentIntegrand_pos_of_mem_support h k hz_pos hzB.1
+    have hsq_pos : 0 < (p.1 - p.2) ^ 2 := by nlinarith
+    have hprod_pos :
+        0 < momentIntegrand h k p.1 * momentIntegrand h k p.2 * (p.1 - p.2) ^ 2 :=
+      mul_pos (mul_pos hfy_pos hfz_pos) hsq_pos
     show G p ≠ 0
     rw [show p = (p.1, p.2) by cases p <;> rfl, hG_square p.1 p.2 hy_pos hz_pos]
-    positivity
+    exact ne_of_gt hprod_pos
 
   have hG_support_pos : 0 < (μ.prod μ) (Function.support G) :=
     lt_of_lt_of_le hrect_pos (measure_mono hrect_support)
