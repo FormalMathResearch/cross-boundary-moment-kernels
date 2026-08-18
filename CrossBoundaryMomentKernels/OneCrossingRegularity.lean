@@ -71,10 +71,13 @@ theorem R_absolutelyContinuousOnInterval
   have hb : 0 ≤ b := le_trans ha.le hab
   have hdInt : IntervalIntegrable (positiveRDerivative h k) volume (0 : ℝ) b :=
     (positiveRDerivative_integrable h k).intervalIntegrable
+  have hzero_mem : (0 : ℝ) ∈ uIcc (0 : ℝ) b := by
+    rw [uIcc_of_le hb]
+    exact left_mem_Icc.2 hb
   have hprim :
       AbsolutelyContinuousOnInterval
         (fun x ↦ ∫ t in (0 : ℝ)..x, positiveRDerivative h k t) (0 : ℝ) b :=
-    hdInt.absolutelyContinuousOnInterval_intervalIntegral (left_mem_Icc.2 hb)
+    hdInt.absolutelyContinuousOnInterval_intervalIntegral hzero_mem
   have hsubset : uIcc a b ⊆ uIcc (0 : ℝ) b := by
     rw [uIcc_of_le hab, uIcc_of_le hb]
     intro x hx
