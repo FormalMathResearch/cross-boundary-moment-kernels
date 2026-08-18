@@ -41,7 +41,7 @@ The planned formalization covers, in particular:
 
 ## Formalization status
 
-**Stage 7: six manuscript result blocks verified.** The project contains the manuscript-level definitions of the half-integer moments, full-support moment weights, the cross-boundary determinant, the canonical normalization, the two crossing kernels, and the cross-boundary probability laws.
+**Stage 8: eight manuscript result blocks verified.** The project contains the manuscript-level definitions of the half-integer moments, full-support moment weights, the cross-boundary determinant, the canonical normalization, the two crossing kernels, the cross-boundary probability laws, and the local/global relative curvature quantities `Lambda` and `Omega`.
 
 The following manuscript results have complete end-to-end Lean proofs and have passed `lake build --wfail` together with `leanchecker`:
 
@@ -93,6 +93,48 @@ The following manuscript results have complete end-to-end Lean proofs and have p
   M_{k+1}(u)-M_k(u)
   =\frac{\operatorname{Var}_{k,u}(X)}{M_k(u)}>0.
   \]
+- **Theorem 2.3 — six-way inter-order equivalence:** for every \(k\ge1\), Lean proves that the following six conditions are equivalent at the canonical crossing \(u_k^*\):
+  \[
+  u_k^*<u_{k+1}^*,
+  \qquad R_{k+1}(u_k^*)>0,
+  \]
+  \[
+  Z_{k+1}(u_k^*)^2>Z_k(u_k^*)Z_{k+2}(u_k^*),
+  \]
+  \[
+  v_k(u_k^*)+Q_{k+1}(\mu_k(u_k^*))>0,
+  \]
+  \[
+  \operatorname{Var}_{k,u_k^*}(X)<\tau_k(\tau_{k+1}-\tau_k),
+  \]
+  and
+  \[
+  \Lambda_k(u_k^*)<\Omega_k,
+  \qquad
+  \Lambda_k(u)=\frac{K_k(u)K_{k+2}(u)}{K_{k+1}(u)^2},
+  \qquad
+  \Omega_k=\frac{N_kN_{k+2}}{N_{k+1}^2}.
+  \]
+  The same development proves the manuscript identities
+  \[
+  \Lambda_k(u)=1+\frac{\operatorname{Var}_{k,u}(X)}{M_k(u)^2},
+  \qquad
+  \Omega_k=\frac{\tau_{k+1}}{\tau_k},
+  \qquad
+  \frac{Z_k(u)Z_{k+2}(u)}{Z_{k+1}(u)^2}=\frac{\Lambda_k(u)}{\Omega_k},
+  \]
+  and the exact three-way alternative from Remark 4.1. In particular, the equality case is proved directly:
+  \[
+  u_k^*=u_{k+1}^*
+  \iff \Lambda_k(u_k^*)=\Omega_k
+  \iff \operatorname{Var}_{k,u_k^*}(X)=\tau_k(\tau_{k+1}-\tau_k),
+  \]
+  with the analogous equivalence for reversed inequalities.
+- **Theorem 2.4 — necessary normalization curvature:** increasing crossing order forces
+  \[
+  \Omega_k>1.
+  \]
+  Lean derives this exactly as in the manuscript from the universal strict inequality \(\Lambda_k(u)>1\) and the Theorem 2.3 criterion \(\Lambda_k(u_k^*)<\Omega_k\).
 
 The one-crossing development also kernel-checks the integrated derivative law and the exact upper-tail identity for `R_k`. These replace the informal endpoint-limit passages inside the Lean proof while preserving the manuscript statement and hypotheses. The three monotonicity phases are made strict directly from the manuscript full-support condition, not from a stronger assumption that `h` is pointwise positive everywhere.
 
@@ -107,11 +149,13 @@ K_k(u)K_{k+2}(u)-K_{k+1}(u)^2
 \]
 and full support supplies two positive-measure cross-boundary rectangles on which the product variable `X = YZ` has separated ranges. This proves non-degeneracy and the strict variance drift using exactly the manuscript support hypothesis.
 
+The inter-order formalization combines the already verified one-crossing, Gram, and size-bias results without adding any new regularity or positivity assumptions. The matching identities `M_k(u_k^*) = τ_k` and `Z_k(u_k^*) = Z_{k+1}(u_k^*) > 0` are proved explicitly before the six equivalences are chained. Equality and reversed crossing order are then proved as separate equivalences rather than inferred only by exclusion.
+
 All headline proofs retain the mathematical argument through local `have` and `calc` blocks. The verified proofs contain no `sorry` placeholders.
 
 No other mathematical theorem in the manuscript should be regarded as Lean-verified until its corresponding proof has been completed and CI has passed. Verification status is recorded theorem by theorem as the development progresses.
 
-The intended order of development is to formalize the algebraic and order-theoretic core first, then the Gamma model, and finally the more analytic curvature-pairing argument.
+The intended order of development is now to formalize the exactly solvable Gamma model as an independent algebraic test of the abstract theory, and finally the more analytic curvature-pairing argument.
 
 ## Toolchain
 
@@ -147,6 +191,9 @@ GitHub Actions builds with warnings treated as failures and runs `leanchecker` o
 - `CrossBoundaryMomentKernels/CrossBoundaryKGram.lean` — two-copy Gram identity and strict index log-convexity of the cross-boundary `K` hierarchy;
 - `CrossBoundaryMomentKernels/SizeBiasVariance.lean` — `L²` integrability, genuine probabilistic variance, strict variance positivity, and the mean drift formula;
 - `CrossBoundaryMomentKernels/SizeBiasManuscriptForm.lean` — exact identification of the formal probability law with the density printed in Theorem 2.2(vi);
+- `CrossBoundaryMomentKernels/InterOrder.lean` — definitions of `Lambda` and `Omega`, crossing matching, kernel/mean factorization, and the local/global curvature identities;
+- `CrossBoundaryMomentKernels/InterOrderEquivalence.lean` — the five connecting equivalences and the complete six-way statement of Theorem 2.3;
+- `CrossBoundaryMomentKernels/InterOrderTrichotomy.lean` — equality and reversed-order cases, the curvature and variance trichotomies from Remark 4.1, and Theorem 2.4;
 - `.github/workflows/ci.yml` — Lean/mathlib CI build and kernel checking;
 - `lakefile.toml` and `lean-toolchain` — reproducible project configuration.
 
