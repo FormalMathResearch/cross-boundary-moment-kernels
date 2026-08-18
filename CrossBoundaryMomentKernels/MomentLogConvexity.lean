@@ -93,29 +93,33 @@ theorem strict_moment_logConvexity_and_gamma_lt
     calc
       (∫ p, G p ∂(μ.prod μ)) =
           ∫ p,
-            ((fun q : ℝ × ℝ ↦
-                momentIntegrand h k q.1 * momentIntegrand h (k + 2) q.2) +
-              (fun q : ℝ × ℝ ↦
-                momentIntegrand h (k + 2) q.1 * momentIntegrand h k q.2) -
-              ((fun q : ℝ × ℝ ↦
-                  momentIntegrand h (k + 1) q.1 * momentIntegrand h (k + 1) q.2) +
-                (fun q : ℝ × ℝ ↦
-                  momentIntegrand h (k + 1) q.1 * momentIntegrand h (k + 1) q.2))) p
+            (momentIntegrand h k p.1 * momentIntegrand h (k + 2) p.2 +
+              momentIntegrand h (k + 2) p.1 * momentIntegrand h k p.2) -
+              (momentIntegrand h (k + 1) p.1 * momentIntegrand h (k + 1) p.2 +
+                momentIntegrand h (k + 1) p.1 * momentIntegrand h (k + 1) p.2)
               ∂(μ.prod μ) := by rfl
       _ =
-          (∫ p, momentIntegrand h k p.1 * momentIntegrand h (k + 2) p.2 ∂(μ.prod μ)) +
-            (∫ p, momentIntegrand h (k + 2) p.1 * momentIntegrand h k p.2 ∂(μ.prod μ)) -
+          (∫ p,
+              momentIntegrand h k p.1 * momentIntegrand h (k + 2) p.2 +
+                momentIntegrand h (k + 2) p.1 * momentIntegrand h k p.2
+              ∂(μ.prod μ)) -
+            ∫ p,
+              momentIntegrand h (k + 1) p.1 * momentIntegrand h (k + 1) p.2 +
+                momentIntegrand h (k + 1) p.1 * momentIntegrand h (k + 1) p.2
+              ∂(μ.prod μ) :=
+            integral_sub (hterm₁.add hterm₂) (hterm₃.add hterm₃)
+      _ =
+          ((∫ p, momentIntegrand h k p.1 * momentIntegrand h (k + 2) p.2 ∂(μ.prod μ)) +
+            (∫ p, momentIntegrand h (k + 2) p.1 * momentIntegrand h k p.2 ∂(μ.prod μ))) -
               ((∫ p, momentIntegrand h (k + 1) p.1 * momentIntegrand h (k + 1) p.2
                   ∂(μ.prod μ)) +
                 (∫ p, momentIntegrand h (k + 1) p.1 * momentIntegrand h (k + 1) p.2
                   ∂(μ.prod μ))) := by
-            rw [integral_sub (hterm₁.add hterm₂) (hterm₃.add hterm₃),
-              integral_add hterm₁ hterm₂, integral_add hterm₃ hterm₃]
+            rw [integral_add hterm₁ hterm₂, integral_add hterm₃ hterm₃]
       _ =
           I h k * I h (k + 2) + I h (k + 2) * I h k -
             (I h (k + 1) * I h (k + 1) + I h (k + 1) * I h (k + 1)) := by
-            rw [integral_prod_mul, integral_prod_mul, integral_prod_mul, integral_prod_mul]
-            rfl
+            simp only [integral_prod_mul, I, μ]
       _ = 2 * (I h k * I h (k + 2) - (I h (k + 1)) ^ 2) := by ring
 
   have hG_square (y z : ℝ) (hy : 0 < y) (hz : 0 < z) :
