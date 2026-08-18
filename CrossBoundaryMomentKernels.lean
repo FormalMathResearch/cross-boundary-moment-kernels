@@ -4,3 +4,4 @@ import CrossBoundaryMomentKernels.CrossBoundaryRepresentation
 import CrossBoundaryMomentKernels.CrossBoundaryManuscriptForm
 import CrossBoundaryMomentKernels.OneCrossing
 import CrossBoundaryMomentKernels.OneCrossingAnalysis
+import CrossBoundaryMomentKernels.OneCrossingPrimitive
