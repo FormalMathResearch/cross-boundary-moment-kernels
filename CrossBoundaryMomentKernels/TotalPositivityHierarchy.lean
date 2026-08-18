@@ -54,7 +54,11 @@ theorem Z_ratio_strict_indices
     (h : FullSupportMomentWeight) {m n : ℕ} (hm : 1 ≤ m) (hmn : m < n) {u v : ℝ}
     (hu : 0 < u) (huv : u < v) :
     Z h n u / Z h m u < Z h n v / Z h m v := by
-  obtain ⟨d, rfl⟩ : ∃ d : ℕ, n = m + d + 1 := by omega
+  let d : ℕ := n - m - 1
+  have hn : n = m + d + 1 := by
+    dsimp [d]
+    omega
+  rw [hn]
   exact Z_ratio_strict_add h hm hu huv
 
 /-- **Strict total positivity of order two.** This is the determinant form of manuscript
