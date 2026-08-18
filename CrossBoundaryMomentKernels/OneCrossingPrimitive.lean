@@ -42,7 +42,13 @@ lemma R_eq_setIntegral_rLinearIntegrand
           (tau h k * I h (k + 1) * J h k u +
             I h (k + 1) * J h (k + 2) u -
             (tau h k * I h k + I h (k + 2)) * J h (k + 1) u) := by
-    rw [rLinearIntegrand, integral_const_mul,
+    change
+      (∫ x,
+        2 *
+          (tau h k * I h (k + 1) * momentIntegrand h k x +
+            I h (k + 1) * momentIntegrand h (k + 2) x -
+            (tau h k * I h k + I h (k + 2)) * momentIntegrand h (k + 1) x) ∂μ) = _
+    rw [integral_const_mul,
       integral_sub (ht₀.add ht₁) ht₂, integral_add ht₀ ht₁]
     simp only [integral_const_mul]
     simp [J, μ]
@@ -97,7 +103,14 @@ lemma integral_rDerivativeIntegrand_Ioi_eq_zero
     hk₁.const_mul _
   have hlinear :
       ∫ x, rLinearIntegrand h k x ∂(volume.restrict (Ioi (0 : ℝ))) = 0 := by
-    rw [rLinearIntegrand, integral_const_mul,
+    change
+      (∫ x,
+        2 *
+          (tau h k * I h (k + 1) * momentIntegrand h k x +
+            I h (k + 1) * momentIntegrand h (k + 2) x -
+            (tau h k * I h k + I h (k + 2)) * momentIntegrand h (k + 1) x)
+          ∂(volume.restrict (Ioi (0 : ℝ)))) = 0
+    rw [integral_const_mul,
       integral_sub (ht₀.add ht₁) ht₂, integral_add ht₀ ht₁]
     simp only [integral_const_mul]
     simp [I]
@@ -112,6 +125,15 @@ lemma integral_rDerivativeIntegrand_Ioi_eq_zero
       exact (rLinearIntegrand_eq_rDerivativeIntegrand h k hx).symm
     _ = 0 := hlinear
 
+/-- The derivative density is integrable on every measurable subset of the positive half-line. -/
+lemma rDerivativeIntegrand_integrableOn_mono_Ioi
+    (h : FullSupportMomentWeight) (k : ℕ) {s : Set ℝ}
+    (hs : s ⊆ Ioi (0 : ℝ)) :
+    IntegrableOn (rDerivativeIntegrand h k) s := by
+  have hglobal : IntegrableOn (rDerivativeIntegrand h k) (Ioi (0 : ℝ)) := by
+    simpa [IntegrableOn] using rDerivativeIntegrand_integrable h k
+  exact hglobal.mono_set hs
+
 /-- **Integrated derivative difference law.** This is the form used to make all three
 monotonicity intervals strict under the manuscript full-support hypothesis. -/
 theorem R_sub_R_eq_setIntegral_rDerivativeIntegrand
@@ -119,18 +141,14 @@ theorem R_sub_R_eq_setIntegral_rDerivativeIntegrand
     (hu : 0 < u) (huv : u < v) :
     R h k v - R h k u =
       ∫ x, rDerivativeIntegrand h k x ∂(volume.restrict (Ioc u v)) := by
-  have hleft : IntegrableOn (rDerivativeIntegrand h k) (Ioc (0 : ℝ) u) := by
-    rw [IntegrableOn]
-    exact (rDerivativeIntegrand_integrable h k).mono_measure
-      (Measure.restrict_mono (by
-        intro x hx
-        exact hx.1))
-  have hmid : IntegrableOn (rDerivativeIntegrand h k) (Ioc u v) := by
-    rw [IntegrableOn]
-    exact (rDerivativeIntegrand_integrable h k).mono_measure
-      (Measure.restrict_mono (by
-        intro x hx
-        exact lt_trans hu hx.1))
+  have hleft : IntegrableOn (rDerivativeIntegrand h k) (Ioc (0 : ℝ) u) :=
+    rDerivativeIntegrand_integrableOn_mono_Ioi h k (by
+      intro x hx
+      exact hx.1)
+  have hmid : IntegrableOn (rDerivativeIntegrand h k) (Ioc u v) :=
+    rDerivativeIntegrand_integrableOn_mono_Ioi h k (by
+      intro x hx
+      exact lt_trans hu hx.1)
   have hdisj : Disjoint (Ioc (0 : ℝ) u) (Ioc u v) := by
     refine disjoint_left.2 ?_
     intro x hx₁ hx₂
@@ -158,18 +176,14 @@ theorem R_eq_neg_tailIntegral_rDerivativeIntegrand
     (h : FullSupportMomentWeight) (k : ℕ) {u : ℝ} (hu : 0 < u) :
     R h k u =
       - ∫ x, rDerivativeIntegrand h k x ∂(volume.restrict (Ioi u)) := by
-  have hleft : IntegrableOn (rDerivativeIntegrand h k) (Ioc (0 : ℝ) u) := by
-    rw [IntegrableOn]
-    exact (rDerivativeIntegrand_integrable h k).mono_measure
-      (Measure.restrict_mono (by
-        intro x hx
-        exact hx.1))
-  have hright : IntegrableOn (rDerivativeIntegrand h k) (Ioi u) := by
-    rw [IntegrableOn]
-    exact (rDerivativeIntegrand_integrable h k).mono_measure
-      (Measure.restrict_mono (by
-        intro x hx
-        exact lt_trans hu hx))
+  have hleft : IntegrableOn (rDerivativeIntegrand h k) (Ioc (0 : ℝ) u) :=
+    rDerivativeIntegrand_integrableOn_mono_Ioi h k (by
+      intro x hx
+      exact hx.1)
+  have hright : IntegrableOn (rDerivativeIntegrand h k) (Ioi u) :=
+    rDerivativeIntegrand_integrableOn_mono_Ioi h k (by
+      intro x hx
+      exact lt_trans hu hx)
   have hdisj : Disjoint (Ioc (0 : ℝ) u) (Ioi u) := by
     refine disjoint_left.2 ?_
     intro x hx₁ hx₂
