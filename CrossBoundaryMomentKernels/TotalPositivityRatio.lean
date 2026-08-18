@@ -88,7 +88,6 @@ lemma zDerivativeIntegrand_succ_eq_tpC_mul_tpPhi
   rw [zDerivativeIntegrand, zDerivativeIntegrand, tpC, tpPhi,
     momentIntegrand_succ h k hx]
   field_simp
-  ring
 
 /-- Full support gives positive Lebesgue measure to the support of `h` in every compact
 positive subinterval. -/
