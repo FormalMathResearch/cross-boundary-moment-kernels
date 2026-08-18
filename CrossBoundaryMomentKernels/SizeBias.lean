@@ -126,7 +126,9 @@ lemma integral_crossBoundaryDensity
   have hKint :
       ∫ p, crossBoundaryIntegrand h k p ∂crossBoundaryBaseMeasure u = K h k u := by
     simpa [crossBoundaryBaseMeasure] using (K_eq_crossBoundaryIntegral h k hu).symm
-  rw [crossBoundaryDensity, integral_const_mul, hKint]
+  change ∫ p, (K h k u)⁻¹ * crossBoundaryIntegrand h k p
+      ∂crossBoundaryBaseMeasure u = 1
+  rw [integral_const_mul, hKint]
   exact inv_mul_cancel₀ (ne_of_gt (K_pos h k hu))
 
 /-- The manuscript density really defines a probability measure. -/
@@ -134,7 +136,7 @@ theorem crossBoundaryMeasure_isProbability
     (h : FullSupportMomentWeight) (k : ℕ) {u : ℝ} (hu : 0 < u) :
     IsProbabilityMeasure (crossBoundaryMeasure h k u) := by
   constructor
-  rw [crossBoundaryMeasure, Measure.withDensity_apply _ MeasurableSet.univ, setLIntegral_univ]
+  rw [crossBoundaryMeasure, withDensity_apply _ MeasurableSet.univ, setLIntegral_univ]
   rw [← ofReal_integral_eq_lintegral_ofReal
     (crossBoundaryDensity_integrable h k hu) (crossBoundaryDensity_nonneg_ae h k hu)]
   rw [integral_crossBoundaryDensity h k hu]
