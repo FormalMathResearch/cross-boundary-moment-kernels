@@ -123,7 +123,7 @@ lemma truncatedGramIntegrand_integrable
 
 /-- Exact integral of the factorized Gram square. -/
 theorem integral_truncatedGramIntegrand
-    (h : FullSupportMomentWeight) (j : ℕ) {u : ℝ} (hu : 0 < u) :
+    (h : FullSupportMomentWeight) (j : ℕ) {u : ℝ} (_hu : 0 < u) :
     ∫ p, truncatedGramIntegrand h j p
         ∂((volume.restrict (Ioc (0 : ℝ) u)).prod (volume.restrict (Ioc (0 : ℝ) u))) =
       2 * (J h j u * J h (j + 2) u - (J h (j + 1) u) ^ 2) := by
