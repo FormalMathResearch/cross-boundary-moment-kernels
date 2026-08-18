@@ -14,3 +14,4 @@ import CrossBoundaryMomentKernels.TotalPositivityRatio
 import CrossBoundaryMomentKernels.TotalPositivityAdjacent
 import CrossBoundaryMomentKernels.TotalPositivityHierarchy
 import CrossBoundaryMomentKernels.GramDecomposition
+import CrossBoundaryMomentKernels.GramManuscriptForm
