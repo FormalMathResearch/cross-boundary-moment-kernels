@@ -41,9 +41,29 @@ The planned formalization covers, in particular:
 
 ## Formalization status
 
-**Initial setup.** No theorem in the manuscript should be regarded as Lean-verified merely because it is listed above. Verification status will be recorded theorem by theorem as the formalization progresses.
+**Stage 1: project setup and core definitions.** The Lean project now contains the manuscript-level definitions of the half-integer moments, the full-support moment-weight hypotheses, the cross-boundary determinant, the canonical normalization, and the two crossing kernels.
+
+No mathematical theorem in the manuscript should be regarded as Lean-verified until its corresponding Lean proof has been completed and CI has passed. Verification status will be recorded theorem by theorem as the development progresses.
 
 The intended order of development is to formalize the algebraic and order-theoretic core first, then the Gamma model, and finally the more analytic curvature-pairing argument.
+
+## Toolchain
+
+The project is pinned to:
+
+- **Lean 4.32.1**
+- **mathlib v4.32.1**
+
+GitHub Actions builds the project on pushes to `main` and on pull requests targeting `main`.
+
+## Repository organization
+
+- `CrossBoundaryMomentKernels.lean` — root library module;
+- `CrossBoundaryMomentKernels/Basic.lean` — basic moment-weight and kernel definitions;
+- `.github/workflows/ci.yml` — Lean/mathlib CI build;
+- `lakefile.toml` and `lean-toolchain` — reproducible project configuration.
+
+Further modules will follow the mathematical dependency structure of the manuscript rather than its page layout whenever that makes the formalization clearer.
 
 ## Goals
 
@@ -53,10 +73,6 @@ The project has two complementary goals:
 2. detect any hidden assumptions, indexing issues, normalization errors, or proof gaps before the manuscript is prepared for publication.
 
 If the Lean development requires a mathematical change to the manuscript, that change will be documented explicitly rather than hidden in the formalization.
-
-## Repository organization
-
-The source-tree layout will be added together with the initial Lean project. Modules will follow the mathematical dependency structure of the manuscript rather than its page layout whenever that makes the formalization clearer.
 
 ## Paper status
 
