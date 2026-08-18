@@ -157,8 +157,7 @@ theorem integral_crossBoundaryKGramIntegrand
       _ =
           K h k u * K h (k + 2) u + K h (k + 2) u * K h k u -
             (K h (k + 1) u * K h (k + 1) u + K h (k + 1) u * K h (k + 1) u) := by
-          rw [integral_prod_mul, integral_prod_mul, integral_prod_mul, integral_prod_mul,
-            hkInt, hk1Int, hk2Int]
+          rw [integral_prod_mul, hkInt, hk1Int, hk2Int]
       _ = 2 * (K h k u * K h (k + 2) u - (K h (k + 1) u) ^ 2) := by ring
   have hrect : ∀ᵐ p ∂μ, p ∈ Ioc (0 : ℝ) u ×ˢ Ioi u := by
     simpa [μ] using ae_mem_crossBoundaryRect u
