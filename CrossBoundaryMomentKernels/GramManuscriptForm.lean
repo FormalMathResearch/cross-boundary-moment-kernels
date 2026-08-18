@@ -9,7 +9,7 @@ namespace CrossBoundaryMomentKernels
 /-- The exact two-variable Gram integrand printed in Theorem 2.2(v). -/
 def truncatedGramManuscriptIntegrand
     (h : ℝ → ℝ) (k : ℕ) (y z : ℝ) : ℝ :=
-  Real.rpow (y * z) ((k : ℝ) + (1 / 2 : ℝ)) * (y - z) ^ 2 * h y * h z
+  (y * z) ^ ((k : ℝ) + (1 / 2 : ℝ)) * (y - z) ^ 2 * h y * h z
 
 /-- On the positive quadrant the factorized Gram integrand is exactly the manuscript integrand. -/
 lemma truncatedGramIntegrand_eq_manuscript
