@@ -146,6 +146,8 @@ lemma adjacent_Z_ratio_lt_below_gamma
       exact mul_lt_mul_of_pos_right (mul_lt_mul_of_pos_left hphi hC) hfx
     refine ⟨?_, ⟨hx0, hxu.le⟩⟩
     dsimp [gapL, c]
+    change (tpC h k * tpPhi h k u * zDerivativeIntegrand h k x -
+      zDerivativeIntegrand h (k + 1) x) ≠ 0
     rw [hrel]
     exact ne_of_gt (sub_pos.mpr hmul)
   have hSuppL : 0 < volume (Function.support gapL ∩ Ioc (0 : ℝ) u) := by
@@ -223,6 +225,8 @@ lemma adjacent_Z_ratio_lt_below_gamma
       exact mul_lt_mul_of_pos_right (mul_lt_mul_of_pos_left hphi hC) hfx
     refine ⟨?_, ⟨hx.2.1, hx.2.2.trans hwv.le⟩⟩
     dsimp [gapR, c]
+    change (zDerivativeIntegrand h (k + 1) x -
+      tpC h k * tpPhi h k u * zDerivativeIntegrand h k x) ≠ 0
     rw [hrel]
     exact ne_of_gt (sub_pos.mpr hmul)
   have hSuppR : 0 < volume (Function.support gapR ∩ Ioc u v) := by
@@ -348,6 +352,8 @@ lemma adjacent_Z_ratio_lt_above_gamma
       exact mul_lt_mul_of_pos_right (mul_lt_mul_of_pos_left hphi hC) hf
     refine ⟨?_, ⟨hx.2.1, hx.2.2.trans hwv.le⟩⟩
     dsimp [gapRemoved, c]
+    change (tpC h k * tpPhi h k v * (- zDerivativeIntegrand h k x) -
+      (- zDerivativeIntegrand h (k + 1) x)) ≠ 0
     rw [hnegrel]
     exact ne_of_gt (sub_pos.mpr hmul)
   have hSuppRem : 0 < volume (Function.support gapRemoved ∩ Ioc u v) := by
@@ -435,6 +441,8 @@ lemma adjacent_Z_ratio_lt_above_gamma
       exact mul_lt_mul_of_pos_right (mul_lt_mul_of_pos_left hphi hC) hf
     refine ⟨?_, hvx⟩
     dsimp [gapTail, c]
+    change ((- zDerivativeIntegrand h (k + 1) x) -
+      tpC h k * tpPhi h k v * (- zDerivativeIntegrand h k x)) ≠ 0
     rw [hnegrel]
     exact ne_of_gt (sub_pos.mpr hmul)
   have hSuppTail : 0 < volume (Function.support gapTail ∩ Ioi v) := by
@@ -489,14 +497,14 @@ theorem adjacent_Z_ratio_strict
     · have hMiddle := adjacent_Z_ratio_lt_middle h hk le_rfl hgv hvMiddle
       exact lt_trans hLower hMiddle
     · have hg1v : gamma h (k + 1) < v := lt_of_not_ge hvMiddle
-      have hMiddle := adjacent_Z_ratio_lt_middle h hk le_rfl hgammas hgammas.le
+      have hMiddle := adjacent_Z_ratio_lt_middle h hk le_rfl hgammas le_rfl
       have hTail := adjacent_Z_ratio_lt_above_gamma h hk le_rfl hg1v
       exact lt_trans hLower (lt_trans hMiddle hTail)
   · have hgu : gamma h k ≤ u := le_of_not_gt huLeft
     by_cases hvMiddle : v ≤ gamma h (k + 1)
     · exact adjacent_Z_ratio_lt_middle h hk hgu huv hvMiddle
     · have hg1v : gamma h (k + 1) < v := lt_of_not_ge hvMiddle
-      have hMiddle := adjacent_Z_ratio_lt_middle h hk hgu hug1 hgammas.le
+      have hMiddle := adjacent_Z_ratio_lt_middle h hk hgu hug1 le_rfl
       have hTail := adjacent_Z_ratio_lt_above_gamma h hk le_rfl hg1v
       exact lt_trans hMiddle hTail
 
