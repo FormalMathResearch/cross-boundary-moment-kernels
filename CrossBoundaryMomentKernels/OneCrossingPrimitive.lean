@@ -8,7 +8,7 @@ namespace CrossBoundaryMomentKernels
 
 /-- The crossing kernel is the lower primitive of the linear derivative normal form. -/
 lemma R_eq_setIntegral_rLinearIntegrand
-    (h : FullSupportMomentWeight) (k : ℕ) {u : ℝ} (hu : 0 < u) :
+    (h : FullSupportMomentWeight) (k : ℕ) {u : ℝ} (_hu : 0 < u) :
     R h k u =
       ∫ x, rLinearIntegrand h k x ∂(volume.restrict (Ioc (0 : ℝ) u)) := by
   let μ : Measure ℝ := volume.restrict (Ioc (0 : ℝ) u)
