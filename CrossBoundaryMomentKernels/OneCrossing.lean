@@ -37,7 +37,8 @@ lemma N_pos (h : FullSupportMomentWeight) {k : ℕ} (hk : 1 ≤ k) :
   have hfac₁ : 0 < (2 : ℝ) * (k : ℝ) - 1 := by linarith
   have hfac₂ : 0 < (2 : ℝ) * (k : ℝ) + 1 := by linarith
   dsimp [N]
-  positivity
+  exact mul_pos (mul_pos (mul_pos hfac₁ hfac₂) (h.momentPositive (k - 1)))
+    (h.momentPositive k)
 
 /-- The scale ratio `τ_k` is strictly positive for `k ≥ 1`. -/
 lemma tau_pos (h : FullSupportMomentWeight) {k : ℕ} (hk : 1 ≤ k) :
@@ -80,9 +81,9 @@ lemma xiMinus_pos (h : FullSupportMomentWeight) {k : ℕ} (hk : 1 ≤ k) :
   have hD : 0 < crossingDisc h k := crossingDisc_pos h hk
   have hsqrt_nonneg : 0 ≤ Real.sqrt (crossingDisc h k) := Real.sqrt_nonneg _
   have hsqrt_sq : (Real.sqrt (crossingDisc h k)) ^ 2 = crossingDisc h k := by
-    rw [sq_sqrt hD.le]
+    exact Real.sq_sqrt hD.le
+  have hDisc_def : crossingDisc h k = (crossingA h k) ^ 2 - 4 * tau h k := rfl
   have hsqrt_lt : Real.sqrt (crossingDisc h k) < crossingA h k := by
-    rw [crossingDisc] at hsqrt_sq
     nlinarith
   rw [xiMinus]
   linarith
@@ -104,7 +105,7 @@ lemma crossingQ_factor (h : FullSupportMomentWeight) {k : ℕ} (hk : 1 ≤ k) (x
     crossingQ h k x = (x - xiMinus h k) * (x - xiPlus h k) := by
   have hD : 0 ≤ crossingDisc h k := (crossingDisc_pos h hk).le
   have hsqrt_sq : (Real.sqrt (crossingDisc h k)) ^ 2 = crossingDisc h k := by
-    rw [sq_sqrt hD]
+    exact Real.sq_sqrt hD
   rw [crossingQ, xiMinus, xiPlus, crossingDisc] at *
   nlinarith
 
