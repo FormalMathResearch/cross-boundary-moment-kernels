@@ -41,7 +41,7 @@ The planned formalization covers, in particular:
 
 ## Formalization status
 
-**Stage 5: four manuscript result blocks verified.** The project contains the manuscript-level definitions of the half-integer moments, full-support moment weights, the cross-boundary determinant, the canonical normalization, and the two crossing kernels.
+**Stage 6: five manuscript result blocks verified.** The project contains the manuscript-level definitions of the half-integer moments, full-support moment weights, the cross-boundary determinant, the canonical normalization, and the two crossing kernels.
 
 The following manuscript results have complete end-to-end Lean proofs and have passed `lake build --wfail` together with `leanchecker`:
 
@@ -59,10 +59,28 @@ The following manuscript results have complete end-to-end Lean proofs and have p
   Z_m(u)Z_n(v)-Z_n(u)Z_m(v)>0.
   \]
   The Lean proof kernel-checks the manuscript derivative ratio \(Z'_{k+1}=C_k\phi_k Z'_k\), the strict monotonicity of \(\phi_k\) on both sides of its pole, the three ratio regions, and the iteration from adjacent indices to arbitrary \(m<n\).
+- **Theorem 2.2(v) — truncated Gram/variance decomposition:** for every \(k\ge1\) and \(u>0\), with
+  \[
+  \mu_k(u)=\frac{J_{k+2}(u)}{J_{k+1}(u)},\qquad
+  v_k(u)=\frac{J_{k+3}(u)}{J_{k+1}(u)}-\mu_k(u)^2,
+  \]
+  the repository proves the exact identity
+  \[
+  \frac{R_{k+1}(u)}{2I_{k+2}J_{k+1}(u)}
+  =v_k(u)+Q_{k+1}(\mu_k(u)),
+  \]
+  the strict inequality \(v_k(u)>0\), its Hankel-ratio form, and the manuscript-exact symmetrized Gram formula
+  \[
+  J_{k+1}J_{k+3}-J_{k+2}^2
+  =\frac12\int_0^u\int_0^u
+  (yz)^{k+1/2}(y-z)^2h(y)h(z)\,dy\,dz.
+  \]
 
 The one-crossing development also kernel-checks the integrated derivative law and the exact upper-tail identity for `R_k`. These replace the informal endpoint-limit passages inside the Lean proof while preserving the manuscript statement and hypotheses. The three monotonicity phases are made strict directly from the manuscript full-support condition, not from a stronger assumption that `h` is pointwise positive everywhere.
 
 Likewise, the strict-TP2 development uses exact lower-primitive, difference, and upper-tail identities for `Z_k`. The lower and upper ratio zones are proved by strict gap integrals supported on positive-measure subintervals supplied by the manuscript full-support hypothesis; no stronger pointwise positivity or smoothness assumption on `h` is introduced.
+
+For the truncated Gram block, strictness is again obtained from the manuscript full-support hypothesis. The formal proof places two disjoint positive-measure support slices inside `(0,u)` and uses their product rectangle to force the symmetrized square integrand to have positive integral. No pointwise positivity or additional regularity assumption on `h` is introduced.
 
 All headline proofs retain the mathematical argument through local `have` and `calc` blocks. The verified proofs contain no `sorry` placeholders.
 
@@ -97,6 +115,8 @@ GitHub Actions builds with warnings treated as failures and runs `leanchecker` o
 - `CrossBoundaryMomentKernels/TotalPositivityRatio.lean` — the manuscript functions `C_k`, `φ_k`, their algebra, derivative-ratio law, and strict derivative-mass lemmas;
 - `CrossBoundaryMomentKernels/TotalPositivityAdjacent.lean` — strict monotonicity of every adjacent quotient `Z_{k+1}/Z_k` across all three gamma regions;
 - `CrossBoundaryMomentKernels/TotalPositivityHierarchy.lean` — iteration to arbitrary index pairs and the strict TP2 determinant theorem;
+- `CrossBoundaryMomentKernels/GramDecomposition.lean` — positivity of truncated moments, strict truncated Hankel log-convexity, the factorized Gram square, and the exact Gram-plus-transport identity;
+- `CrossBoundaryMomentKernels/GramManuscriptForm.lean` — manuscript-exact `(yz)^{k+1/2}(y-z)^2h(y)h(z)` integrand and iterated double-integral form;
 - `.github/workflows/ci.yml` — Lean/mathlib CI build and kernel checking;
 - `lakefile.toml` and `lean-toolchain` — reproducible project configuration.
 
