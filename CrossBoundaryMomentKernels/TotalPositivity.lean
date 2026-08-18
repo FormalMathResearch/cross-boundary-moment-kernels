@@ -24,7 +24,6 @@ lemma zLinearIntegrand_eq_zDerivativeIntegrand
   have hNk : N h k ≠ 0 := ne_of_gt (N_pos h hk)
   rw [zLinearIntegrand, zDerivativeIntegrand, gamma, momentIntegrand_succ h k hx]
   field_simp
-  ring
 
 /-- The linear derivative normal form is globally integrable on the positive half-line. -/
 lemma zLinearIntegrand_integrable
@@ -121,9 +120,7 @@ lemma integral_zDerivativeIntegrand_Ioi_eq_zero
         (I h (k + 1) * momentIntegrand h k x - I h k * momentIntegrand h (k + 1) x)
         ∂(volume.restrict (Ioi (0 : ℝ)))) = 0
     rw [integral_const_mul, integral_sub ht₀ ht₁]
-    simp only [integral_const_mul]
-    simp [I]
-    ring
+    all_goals simp [I, mul_comm]
   calc
     ∫ x, zDerivativeIntegrand h k x ∂(volume.restrict (Ioi (0 : ℝ))) =
         ∫ x, zLinearIntegrand h k x ∂(volume.restrict (Ioi (0 : ℝ))) := by
