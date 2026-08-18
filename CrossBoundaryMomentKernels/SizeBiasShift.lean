@@ -17,7 +17,8 @@ lemma multiplicativeBiasDensity_measurable
     (h : ℝ → ℝ) (k : ℕ) (u : ℝ) :
     Measurable (multiplicativeBiasDensity h k u) := by
   have hX : Measurable crossBoundaryProduct := by
-    simpa [crossBoundaryProduct] using measurable_fst.mul measurable_snd
+    change Measurable (fun p : ℝ × ℝ ↦ p.1 * p.2)
+    exact measurable_fst.mul measurable_snd
   exact (hX.div_const _).ennreal_ofReal
 
 /-- On the cross-boundary domain, the real normalized densities satisfy
@@ -36,7 +37,6 @@ lemma crossBoundaryDensity_succ_eq_mul
     crossBoundaryMean_eq_K_ratio h k hu]
   simp only [pow_one]
   field_simp [hK, hK1]
-  ring
 
 /-- The ENNReal densities satisfy the exact multiplication law needed by `withDensity`. -/
 lemma crossBoundaryENNRealDensity_succ_eq_mul
@@ -45,14 +45,8 @@ lemma crossBoundaryENNRealDensity_succ_eq_mul
         crossBoundaryBaseMeasure u]
       fun p ↦ ENNReal.ofReal (crossBoundaryDensity h k u p) *
         multiplicativeBiasDensity h k u p := by
-  have hM : 0 < crossBoundaryMean h k u := crossBoundaryMean_pos h k hu
   filter_upwards [crossBoundaryDensity_succ_eq_mul h k hu,
-    crossBoundaryDensity_nonneg_ae h k hu, ae_mem_crossBoundaryRect u] with p hdens hden0 hp
-  have hX0 : 0 ≤ crossBoundaryProduct p := by
-    rw [crossBoundaryProduct]
-    exact mul_nonneg hp.1.1.le (le_trans hu.le hp.2.le)
-  have hbias0 : 0 ≤ crossBoundaryProduct p / crossBoundaryMean h k u :=
-    div_nonneg hX0 hM.le
+    crossBoundaryDensity_nonneg_ae h k hu] with p hdens hden0
   rw [multiplicativeBiasDensity]
   calc
     ENNReal.ofReal (crossBoundaryDensity h (k + 1) u p) =
