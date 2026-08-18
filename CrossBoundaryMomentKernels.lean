@@ -1,2 +1,3 @@
 import CrossBoundaryMomentKernels.Basic
 import CrossBoundaryMomentKernels.MomentLogConvexity
+import CrossBoundaryMomentKernels.CrossBoundaryRepresentation
