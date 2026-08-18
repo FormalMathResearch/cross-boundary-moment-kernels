@@ -22,3 +22,4 @@ import CrossBoundaryMomentKernels.SizeBiasVariance
 import CrossBoundaryMomentKernels.SizeBiasManuscriptForm
 import CrossBoundaryMomentKernels.InterOrder
 import CrossBoundaryMomentKernels.InterOrderEquivalence
+import CrossBoundaryMomentKernels.InterOrderTrichotomy
