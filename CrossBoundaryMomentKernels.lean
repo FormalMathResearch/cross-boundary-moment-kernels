@@ -7,3 +7,4 @@ import CrossBoundaryMomentKernels.OneCrossingAnalysis
 import CrossBoundaryMomentKernels.OneCrossingPrimitive
 import CrossBoundaryMomentKernels.OneCrossingSigns
 import CrossBoundaryMomentKernels.OneCrossingRegularity
+import CrossBoundaryMomentKernels.OneCrossingGeometry
