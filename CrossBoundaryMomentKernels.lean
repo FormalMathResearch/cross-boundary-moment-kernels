@@ -20,3 +20,4 @@ import CrossBoundaryMomentKernels.SizeBiasShift
 import CrossBoundaryMomentKernels.CrossBoundaryKGram
 import CrossBoundaryMomentKernels.SizeBiasVariance
 import CrossBoundaryMomentKernels.SizeBiasManuscriptForm
+import CrossBoundaryMomentKernels.InterOrder
