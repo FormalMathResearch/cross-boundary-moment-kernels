@@ -17,3 +17,4 @@ import CrossBoundaryMomentKernels.GramDecomposition
 import CrossBoundaryMomentKernels.GramManuscriptForm
 import CrossBoundaryMomentKernels.SizeBias
 import CrossBoundaryMomentKernels.SizeBiasShift
+import CrossBoundaryMomentKernels.CrossBoundaryKGram
