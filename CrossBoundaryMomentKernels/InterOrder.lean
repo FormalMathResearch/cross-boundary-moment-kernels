@@ -26,7 +26,7 @@ lemma uStar_pos
 /-- Factorization used at the start of the manuscript proof of Theorem 2.3:
 `R_k = 2 K_k (τ_k - M_k)`. -/
 theorem R_eq_two_K_mul_tau_sub_mean
-    (h : FullSupportMomentWeight) {k : ℕ} (hk : 1 ≤ k) {u : ℝ} (hu : 0 < u) :
+    (h : FullSupportMomentWeight) {k : ℕ} (_hk : 1 ≤ k) {u : ℝ} (hu : 0 < u) :
     R h k u = 2 * K h k u * (tau h k - crossBoundaryMean h k u) := by
   have hK : K h k u ≠ 0 := ne_of_gt (K_pos h k hu)
   rw [R, crossBoundaryMean_eq_K_ratio h k hu]
@@ -115,6 +115,7 @@ theorem Lambda_eq_one_add_variance_div_mean_sq
   rw [Lambda, crossBoundaryVariance_eq_K h k hu,
     crossBoundaryMean_eq_K_ratio h k hu]
   field_simp [hK, hK1]
+  ring
 
 /-- Universal strict relative log-convexity of the unnormalized `K` hierarchy. -/
 theorem one_lt_Lambda
