@@ -51,3 +51,4 @@ import CrossBoundaryMomentKernels.CurvatureSignedFubiniR
 import CrossBoundaryMomentKernels.CurvatureSymmetryFTC
 import CrossBoundaryMomentKernels.CurvaturePairingTheorem
 import CrossBoundaryMomentKernels.CurvatureBalance
+import CrossBoundaryMomentKernels.CurvatureManuscriptForm
