@@ -43,10 +43,11 @@ theorem gamma_momentCurvature_eq {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (
   have he1 : (-1 : ℝ) + (k : ℝ) * 2 ≠ 0 := by linarith
   have he2 : (1 : ℝ) + (k : ℝ) * 2 ≠ 0 := by linarith
   have he3 : (3 : ℝ) + (k : ℝ) * 2 ≠ 0 := by linarith
+  have hf2 : (2 : ℝ) * ((k : ℝ) + 1) - 1 ≠ 0 := by linarith
+  have hf3 : (2 : ℝ) * ((k : ℝ) + 2) - 1 ≠ 0 := by linarith
   field_simp [h1, h2, h3, hd1, hd2, hd3, he1, he2, he3] <;>
-    try field_simp [he1, he2, he3] <;>
-    try field_simp [he1, he2, he3] <;>
-    try field_simp [he1, he2, he3] <;>
+    try field_simp [he1, he2, he3, hf2, hf3] <;>
+    try field_simp [he1, he2, he3, hf2, hf3] <;>
     ring
 
 /-- Positive Gamma shape parameter gives strictly positive relative moment curvature. -/
@@ -63,18 +64,16 @@ theorem gamma_momentCurvature_pos {a : ℝ} (ha : 0 < a) {k : ℕ} (hk : 1 ≤ k
   exact div_pos (mul_pos (by norm_num) ha) hden
 
 /-- Logarithmic profile of the Gamma weight on the positive half-line. -/
-def gammaLogProfile (a y : ℝ) : ℝ := a * Real.log y - y
+def gammaLogProfile (a : ℝ) : ℝ → ℝ :=
+  (fun y : ℝ => a * Real.log y) - id
 
 /-- The derivative of the logarithmic Gamma profile is `a/y - 1`. -/
 theorem gammaLogProfile_derivative (a : ℝ) {y : ℝ} (hy : 0 < y) :
     HasDerivAt (gammaLogProfile a) (a / y - 1) y := by
   have hy0 : y ≠ 0 := ne_of_gt hy
-  change HasDerivAt (fun x : ℝ => a * Real.log x - x) (a / y - 1) y
-  convert ((Real.hasDerivAt_log hy0).const_mul a).sub (hasDerivAt_id y) using 1 <;>
-    first
-    | funext x
-      rfl
-    | rw [div_eq_mul_inv]
+  unfold gammaLogProfile
+  simpa [div_eq_mul_inv] using
+    ((Real.hasDerivAt_log hy0).const_mul a).sub (hasDerivAt_id y)
 
 /-- The logarithmic Gamma profile has second derivative `-a/y²`. -/
 theorem gammaLogProfile_second_derivative (a : ℝ) {y : ℝ} (hy : 0 < y) :
