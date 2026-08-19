@@ -68,6 +68,52 @@ theorem gammaMeasure_exp_integrable_of_lt_one {α t : ℝ} (hα : 0 < α) (ht : 
   have hxnonneg := ProbabilityTheory.gammaPDFReal_nonneg hα (by norm_num : (0 : ℝ) < 1) x
   simp [ProbabilityTheory.gammaPDF, ENNReal.toReal_ofReal hxnonneg, smul_eq_mul]
 
+/-- The Lebesgue-density form of the preceding Gamma exponential-integrability statement. -/
+lemma gammaPDFReal_mul_exp_integrable_of_lt_one {α t : ℝ} (hα : 0 < α) (ht : t < 1) :
+    Integrable (fun x : ℝ =>
+      ProbabilityTheory.gammaPDFReal α 1 x * Real.exp (t * x)) := by
+  have h := gammaMeasure_exp_integrable_of_lt_one hα ht
+  have hmeas : AEMeasurable (ProbabilityTheory.gammaPDF α 1) volume :=
+    (ProbabilityTheory.measurable_gammaPDFReal α 1).ennreal_ofReal.aemeasurable
+  have htop : ∀ᵐ x ∂volume, ProbabilityTheory.gammaPDF α 1 x < ∞ := by
+    filter_upwards with x
+    exact ENNReal.ofReal_lt_top
+  rw [ProbabilityTheory.gammaMeasure,
+    integrable_withDensity_iff_integrable_smul₀' hmeas htop] at h
+  apply h.congr
+  filter_upwards with x
+  have hxnonneg := ProbabilityTheory.gammaPDFReal_nonneg hα (by norm_num : (0 : ℝ) < 1) x
+  simp [ProbabilityTheory.gammaPDF, ENNReal.toReal_ofReal hxnonneg, smul_eq_mul]
+
+/-- A Gamma moment integrand retains an integrable upper tail after multiplication by `exp(z/2)`. -/
+lemma gammaMomentIntegrand_mul_exp_half_integrable_Ioi
+    {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (j : ℕ) {u : ℝ} (hu : 0 < u) :
+    Integrable (fun z : ℝ =>
+      momentIntegrand (gammaFullSupportWeight a ha) j z * Real.exp ((1 / 2 : ℝ) * z))
+      (volume.restrict (Ioi u)) := by
+  let α : ℝ := gammaAlpha a j
+  have hα : 0 < α := gammaAlpha_pos ha j
+  have hGamma : Real.Gamma α ≠ 0 := ne_of_gt (Real.Gamma_pos_of_pos hα)
+  have hpdf : Integrable (fun z : ℝ =>
+      ProbabilityTheory.gammaPDFReal α 1 z * Real.exp ((1 / 2 : ℝ) * z)) :=
+    gammaPDFReal_mul_exp_integrable_of_lt_one hα (by norm_num)
+  have hscaled := hpdf.const_mul (Real.Gamma α)
+  have hrestrict := hscaled.mono_measure (Measure.restrict_le_self)
+  apply hrestrict.congr
+  refine (ae_restrict_iff' measurableSet_Ioi).2 ?_
+  filter_upwards with z hz
+  have hz0 : 0 < z := lt_trans hu hz
+  change Real.Gamma α *
+      (ProbabilityTheory.gammaPDFReal α 1 z * Real.exp ((1 / 2 : ℝ) * z)) =
+    momentIntegrand (gammaModelWeight a) j z * Real.exp ((1 / 2 : ℝ) * z)
+  rw [gammaMomentIntegrand_eq a j hz0]
+  simp [ProbabilityTheory.gammaPDFReal, hz0.le]
+  change Real.Gamma α *
+      ((Real.Gamma α)⁻¹ * z ^ (α - 1) * Real.exp (-z) * Real.exp ((1 / 2 : ℝ) * z)) =
+    Real.exp (-z) * z ^ (α - 1) * Real.exp ((1 / 2 : ℝ) * z)
+  field_simp [hGamma]
+  ring
+
 /-- Under the Gamma cross-boundary law, the normalized product `X/u` is nonnegative almost surely. -/
 lemma gammaNormalizedProduct_nonneg_ae
     {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (k : ℕ) {u : ℝ} (hu : 0 < u) :
