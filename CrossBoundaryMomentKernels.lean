@@ -48,3 +48,4 @@ import CrossBoundaryMomentKernels.CurvatureBracket
 import CrossBoundaryMomentKernels.CurvatureSignedFubini
 import CrossBoundaryMomentKernels.CurvatureSignedIntegrability
 import CrossBoundaryMomentKernels.CurvatureSignedFubiniR
+import CrossBoundaryMomentKernels.CurvatureSymmetryFTC
