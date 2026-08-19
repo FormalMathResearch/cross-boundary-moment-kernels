@@ -126,16 +126,19 @@ theorem gamma_theorem_2_7_crossing
     gamma_uStar_eq_iff_threshold ha hk, gamma_uStar_reverse_order_iff ha hk⟩
 
 /-- **Manuscript Corollary 2.8, publication-facing form.**
-For `a > 0` the logarithmic profile `log h_a(y) = a log y - y` is strictly concave on
-`(0,∞)`, i.e. the Gamma weight is strictly log-concave there.  The `a = 1` instance gives
-the manuscript's explicit reversed crossing. -/
+The first conjunct identifies the formal logarithmic profile with the actual logarithm of
+`h_a` on `(0,∞)`.  Its strict concavity therefore states strict log-concavity of the weight,
+and the `a = 1` instance gives the manuscript's explicit reversed crossing. -/
 theorem gamma_corollary_2_8 {a : ℝ} (ha : 0 < a) :
+    Set.EqOn (gammaLogProfile a) (fun y => Real.log (gammaModelWeight a y)) (Ioi (0 : ℝ)) ∧
     StrictConcaveOn ℝ (Ioi (0 : ℝ)) (gammaLogProfile a) ∧
     uStar (gammaFullSupportWeight 1 (by norm_num)) 1 = 15 / 2 ∧
     uStar (gammaFullSupportWeight 1 (by norm_num)) 2 = 35 / 6 ∧
     uStar (gammaFullSupportWeight 1 (by norm_num)) 2 <
       uStar (gammaFullSupportWeight 1 (by norm_num)) 1 := by
-  exact ⟨gammaLogProfile_strictConcaveOn_Ioi ha, gamma_a_one_reversed_crossing⟩
+  refine ⟨?_, gammaLogProfile_strictConcaveOn_Ioi ha, gamma_a_one_reversed_crossing⟩
+  intro y hy
+  exact gammaLogProfile_eq_log_gammaModelWeight a hy
 
 /-- **Manuscript Corollary 2.9, publication-facing form.**
 The first three conjuncts are the exact `s_k`/`κ_k` formula and positivity assertion for
