@@ -1,4 +1,4 @@
-import CrossBoundaryMomentKernels.CurvaturePairingTheorem
+import CrossBoundaryMomentKernels.CurvatureSymmetryFTC
 import CrossBoundaryMomentKernels.OneCrossingGeometry
 
 noncomputable section
@@ -63,7 +63,9 @@ lemma uStar_pos_of_curvatureHypotheses
   exact lt_trans (xiMinus_pos h H.index) (uStar_spec h H.index).1.1
 
 /-- Under `V'' ≥ 0`, the curvature pairing splits at the unique crossing into its positive
-left lobe minus the absolute size of its negative right lobe. -/
+left lobe minus the absolute size of its negative right lobe.  This is an analytic helper for
+the publication-facing Corollary 2.6; the manuscript corollary itself is stated only in
+`CurvatureManuscriptForm.lean`. -/
 theorem CurvaturePairingHypotheses.curvaturePairingIntegral_eq_left_sub_rightAbs
     {h : FullSupportMomentWeight} {V : ℝ → ℝ} {k : ℕ}
     (H : CurvaturePairingHypotheses h V k)
@@ -96,45 +98,5 @@ theorem CurvaturePairingHypotheses.curvaturePairingIntegral_eq_left_sub_rightAbs
     ring
   rw [htailEq] at hsplit
   simpa [f, sub_eq_add_neg] using hsplit.symm
-
-/-- **Manuscript Corollary 2.6 (curvature balance for log-concave weights).**
-Under the hypotheses of Theorem 2.5 and `V'' ≥ 0`, the sign of `κ_k` is exactly determined by
-whether the positive lobe before `u_k^*` dominates the absolute negative lobe after `u_k^*`. -/
-theorem CurvaturePairingHypotheses.momentCurvature_nonneg_iff_curvatureBalance
-    {h : FullSupportMomentWeight} {V : ℝ → ℝ} {k : ℕ}
-    (H : CurvaturePairingHypotheses h V k)
-    (hconvex : ∀ u : ℝ, 0 < u → 0 ≤ deriv (deriv V) u) :
-    0 ≤ momentCurvature h k ↔
-      (∫ u in (0 : ℝ)..uStar h k, deriv (deriv V) u * R h k u) ≥
-        ∫ u in Ioi (uStar h k), deriv (deriv V) u * |R h k u| := by
-  have hpairing := H.momentCurvature_eq_curvaturePairing
-  have hsplit := H.curvaturePairingIntegral_eq_left_sub_rightAbs hconvex
-  have hB : 0 < momentB k := by
-    rw [momentB_eq_A_succ]
-    exact momentA_pos (by omega)
-  have hC : 0 < momentC k := by
-    rw [momentC_eq_A_add_two]
-    exact momentA_pos (by omega)
-  have hIk : 0 < I h k := h.momentPositive k
-  have hIk1 : 0 < I h (k + 1) := h.momentPositive (k + 1)
-  have hden : 0 < 2 * momentB k * momentC k * I h k * I h (k + 1) :=
-    mul_pos (mul_pos (mul_pos (mul_pos (by norm_num) hB) hC) hIk) hIk1
-  have hcoef :
-      0 < (2 * momentB k * momentC k * I h k * I h (k + 1))⁻¹ :=
-    inv_pos.mpr hden
-  rw [hpairing, hsplit]
-  constructor
-  · intro hnonneg
-    have hdiff :
-        0 ≤ (∫ u in (0 : ℝ)..uStar h k, deriv (deriv V) u * R h k u) -
-          ∫ u in Ioi (uStar h k), deriv (deriv V) u * |R h k u| :=
-      (mul_nonneg_iff_of_pos_left hcoef).mp hnonneg
-    linarith
-  · intro hbalance
-    have hdiff :
-        0 ≤ (∫ u in (0 : ℝ)..uStar h k, deriv (deriv V) u * R h k u) -
-          ∫ u in Ioi (uStar h k), deriv (deriv V) u * |R h k u| := by
-      linarith
-    exact mul_nonneg hcoef.le hdiff
 
 end CrossBoundaryMomentKernels
