@@ -76,25 +76,26 @@ theorem gammaNormalizedProduct_complexMGF_eqOn_strip
       (gammaAlpha_pos ha k) hz
     simpa [ν] using hz'
   have hpre : IsPreconnected {z : ℂ | z.re ∈ Ioo (-(1 / 2 : ℝ)) (1 / 2 : ℝ)} := by
-    exact (convex_Ioo.linear_preimage Complex.reLm).isPreconnected
+    exact ((convex_Ioo (𝕜 := ℝ) (-(1 / 2 : ℝ)) (1 / 2 : ℝ)).linear_preimage
+      Complex.reLm).isPreconnected
   refine AnalyticOnNhd.eqOn_of_preconnected_of_frequently_eq hX hG hpre
     (z₀ := (0 : ℂ)) (by norm_num) ?_
   have hlocal :
       ProbabilityTheory.mgf (gammaNormalizedProduct u) μ =ᶠ[𝓝 (0 : ℝ)]
         ProbabilityTheory.mgf id ν := by
     simpa [μ, h, ν] using gammaNormalizedProduct_mgf_eventuallyEq ha k hu
-  have hlocal' : ∀ᶠ x in 𝓝[≠] (0 : ℝ),
-      ProbabilityTheory.complexMGF (gammaNormalizedProduct u) μ x =
-        ProbabilityTheory.complexMGF id ν x := by
-    have hm : ∀ᶠ x in 𝓝[≠] (0 : ℝ),
+  have hlocal' : ∀ᶠ (x : ℝ) in 𝓝[≠] (0 : ℝ),
+      ProbabilityTheory.complexMGF (gammaNormalizedProduct u) μ (x : ℂ) =
+        ProbabilityTheory.complexMGF id ν (x : ℂ) := by
+    have hm : ∀ᶠ (x : ℝ) in 𝓝[≠] (0 : ℝ),
         ProbabilityTheory.mgf (gammaNormalizedProduct u) μ x =
           ProbabilityTheory.mgf id ν x :=
       hlocal.filter_mono inf_le_left
     filter_upwards [hm] with x hx
     simpa [ProbabilityTheory.complexMGF_ofReal] using hx
-  have hreal : ∃ᶠ x in 𝓝[≠] (0 : ℝ),
-      ProbabilityTheory.complexMGF (gammaNormalizedProduct u) μ x =
-        ProbabilityTheory.complexMGF id ν x := hlocal'.frequently
+  have hreal : ∃ᶠ (x : ℝ) in 𝓝[≠] (0 : ℝ),
+      ProbabilityTheory.complexMGF (gammaNormalizedProduct u) μ (x : ℂ) =
+        ProbabilityTheory.complexMGF id ν (x : ℂ) := hlocal'.frequently
   rw [frequently_iff_seq_forall] at hreal ⊢
   obtain ⟨xs, hx_tendsto, hx_eq⟩ := hreal
   refine ⟨fun n ↦ (xs n : ℂ), ?_, fun n ↦ ?_⟩
