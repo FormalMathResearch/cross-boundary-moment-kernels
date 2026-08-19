@@ -38,3 +38,4 @@ import CrossBoundaryMomentKernels.CurvatureTiltedMeasure
 import CrossBoundaryMomentKernels.CurvatureCovariance
 import CrossBoundaryMomentKernels.CurvatureTwoCopy
 import CrossBoundaryMomentKernels.CurvatureTwoCopyKappa
+import CrossBoundaryMomentKernels.CurvatureTwoCopyManuscript
