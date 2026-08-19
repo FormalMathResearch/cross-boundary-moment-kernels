@@ -35,3 +35,4 @@ import CrossBoundaryMomentKernels.GammaManuscriptForm
 import CrossBoundaryMomentKernels.CurvaturePairing
 import CrossBoundaryMomentKernels.CurvaturePairingMoments
 import CrossBoundaryMomentKernels.CurvatureTiltedMeasure
+import CrossBoundaryMomentKernels.CurvatureCovariance
