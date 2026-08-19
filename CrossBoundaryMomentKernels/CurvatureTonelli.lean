@@ -65,8 +65,6 @@ theorem lintegral_orderedTonelliDensity_middle
   by_cases hy : 0 < y
   · rw [if_pos hy, lintegral_orderedTonelliDensity_middle_of_pos hq hy]
   · rw [if_neg hy]
-    apply lintegral_congr
-    intro u
     simp [orderedTonelliDensity, hy]
 
 /-- For fixed `u`, the pair slice is exactly the rectangle `0 < y < u < z`.
