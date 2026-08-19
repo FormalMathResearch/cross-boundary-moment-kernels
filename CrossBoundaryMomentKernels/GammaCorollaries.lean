@@ -70,6 +70,14 @@ theorem gamma_momentCurvature_pos {a : ℝ} (ha : 0 < a) {k : ℕ} (hk : 1 ≤ k
 def gammaLogProfile (a : ℝ) : ℝ → ℝ :=
   (fun y : ℝ => a * Real.log y) - id
 
+/-- On `(0,∞)`, the named logarithmic profile is exactly the logarithm of the Gamma weight. -/
+theorem gammaLogProfile_eq_log_gammaModelWeight (a : ℝ) {y : ℝ} (hy : 0 < y) :
+    gammaLogProfile a y = Real.log (gammaModelWeight a y) := by
+  change a * Real.log y - y = Real.log (y ^ a * Real.exp (-y))
+  rw [Real.log_mul (ne_of_gt (Real.rpow_pos_of_pos hy a)) (Real.exp_ne_zero (-y)),
+    Real.log_rpow hy a, Real.log_exp]
+  ring
+
 /-- The derivative of the logarithmic Gamma profile is `a/y - 1`. -/
 theorem gammaLogProfile_derivative (a : ℝ) {y : ℝ} (hy : 0 < y) :
     HasDerivAt (gammaLogProfile a) (a / y - 1) y := by
