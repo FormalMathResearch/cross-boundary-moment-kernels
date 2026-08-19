@@ -28,3 +28,4 @@ import CrossBoundaryMomentKernels.GammaRecurrence
 import CrossBoundaryMomentKernels.GammaExplicit
 import CrossBoundaryMomentKernels.MomentCurvature
 import CrossBoundaryMomentKernels.GammaCorollaries
+import CrossBoundaryMomentKernels.GammaProductLaw
