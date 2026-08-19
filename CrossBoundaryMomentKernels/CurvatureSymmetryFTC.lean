@@ -48,8 +48,7 @@ theorem curvatureTwoCopyIntegral_eq_two_upperHalf
     funext p
     rcases lt_trichotomy p.1 p.2 with hlt | heq | hgt
     · simp [curvatureUpperHalf, curvatureLowerHalf, hlt, not_lt_of_ge hlt.le]
-    · subst p.2
-      simp [curvatureUpperHalf, curvatureLowerHalf, f, curvatureTwoCopyIntegrand]
+    · simp [curvatureUpperHalf, curvatureLowerHalf, f, curvatureTwoCopyIntegrand, heq]
     · simp [curvatureUpperHalf, curvatureLowerHalf, hgt, not_lt_of_ge hgt.le]
   have hswap :
       (fun p : ℝ × ℝ => curvatureUpperHalf.indicator f p.swap) =
@@ -134,9 +133,7 @@ theorem CurvaturePairingHypotheses.twoCopyIntegral_eq_ordered_signedFTC
         rw [Set.indicator_of_mem hpos, Set.indicator_of_mem hup]
         dsimp [f]
         exact H.two_mul_twoCopy_eq_signedFTC hy hyz
-      · have hup : p ∉ curvatureUpperHalf := by simpa [curvatureUpperHalf] using hyz
-        rw [Set.indicator_of_notMem hup]
-        simp [Ioc_eq_empty hyz]
+      · simp [Set.indicator, curvatureUpperHalf, hyz, Ioc_eq_empty hyz]
     · rw [if_neg hy]
       have hnotpos : p ∉ Ioi (0 : ℝ) ×ˢ Ioi (0 : ℝ) := by
         intro hp
@@ -160,9 +157,9 @@ theorem CurvaturePairingHypotheses.twoCopyIntegral_eq_ordered_signedFTC
         (Ioi (0 : ℝ) ×ˢ Ioi (0 : ℝ)).indicator
           (curvatureUpperHalf.indicator (fun p : ℝ × ℝ => 2 * f p)) p
           ∂(volume.prod volume) := by
-      rw [← Measure.prod_restrict]
-      rw [integral_indicator hpositive]
-      rfl
+      dsimp [μ]
+      rw [Measure.prod_restrict]
+      rw [← integral_indicator hpositive]
     _ = ∫ p : ℝ × ℝ,
         (if 0 < p.1 then
           2 * curvatureSignedEnvelopeDensity h k p *
