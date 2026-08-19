@@ -65,7 +65,7 @@ theorem lintegral_orderedTonelliDensity_middle
   by_cases hy : 0 < y
   · rw [if_pos hy, lintegral_orderedTonelliDensity_middle_of_pos hq hy]
   · rw [if_neg hy]
-    apply lintegral_zero
+    apply lintegral_congr
     intro u
     simp [orderedTonelliDensity, hy]
 
@@ -82,15 +82,17 @@ theorem lintegral_orderedTonelliDensity_pair
       (fun p : ℝ × ℝ => orderedTonelliDensity g q (p, u)) =
         (Ioo (0 : ℝ) u ×ˢ Ioi u).indicator (fun p => g p * q u) := by
     funext p
-    simp [orderedTonelliDensity, Set.indicator, mem_Ioo, mem_Ioi, mem_prod]
+    by_cases h0 : 0 < p.1
+    · by_cases h1 : p.1 < u
+      · by_cases h2 : u < p.2 <;>
+          simp [orderedTonelliDensity, Set.indicator, mem_Ioo, mem_Ioi, mem_prod,
+            h0, h1, h2]
+      · simp [orderedTonelliDensity, Set.indicator, mem_Ioo, mem_Ioi, mem_prod, h0, h1]
+    · simp [orderedTonelliDensity, Set.indicator, mem_Ioo, mem_Ioi, mem_prod, h0]
   rw [heq, lintegral_indicator hs]
+  rw [lintegral_mul_const (q u) hg]
   rw [MeasureTheory.setLIntegral_prod]
-  · have hinner : Measurable
-        (fun y : ℝ => ∫⁻ z : ℝ in Ioi u, g (y, z) ∂volume) := by
-      exact hg.lintegral_prod_right'
-    simp_rw [lintegral_mul_const (q u) (hg.comp measurable_prodMk_left)]
-    exact lintegral_mul_const (q u) hinner
-  · exact ((hg.mul_const (q u)).aemeasurable)
+  exact hg.aemeasurable
 
 /-- Generic moving-domain Tonelli identity for the ordered region `0 < y < u < z`.
 It is an equality of nonnegative extended integrals, hence it requires no finiteness or
