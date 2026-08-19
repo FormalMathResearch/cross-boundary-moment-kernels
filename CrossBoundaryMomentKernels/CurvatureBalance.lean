@@ -52,9 +52,8 @@ theorem CurvaturePairingHypotheses.curvaturePairingIntegrand_integrableOn_positi
   apply hactual.congr
   filter_upwards with u
   by_cases hu : 0 < u
-  · simp [Set.indicator_of_mem hu, hu, q0]
-  · have hnot : u ∉ Ioi (0 : ℝ) := hu
-    simp [Set.indicator_of_notMem hnot, hu]
+  · simp [hu, q0]
+  · simp [hu]
 
 /-- The canonical crossing point is strictly positive for the curvature range `k ≥ 1`. -/
 lemma uStar_pos_of_curvatureHypotheses
@@ -85,6 +84,8 @@ theorem CurvaturePairingHypotheses.curvaturePairingIntegral_eq_left_sub_rightAbs
         -(∫ u in Ioi (uStar h k), deriv (deriv V) u * |R h k u|) := by
     rw [← integral_neg]
     apply integral_congr_ae
+    change ∀ᵐ u ∂volume.restrict (Ioi (uStar h k)),
+      f u = -(deriv (deriv V) u * |R h k u|)
     rw [ae_restrict_iff' measurableSet_Ioi]
     filter_upwards with u hu
     have hu0 : 0 < u := lt_trans huStar hu
@@ -93,8 +94,8 @@ theorem CurvaturePairingHypotheses.curvaturePairingIntegral_eq_left_sub_rightAbs
     simp only [f]
     rw [abs_of_neg hRneg]
     ring
-  rw [intervalIntegral.integral_of_le huStar.le, htailEq] at hsplit
-  linarith
+  rw [htailEq] at hsplit
+  simpa [f, sub_eq_add_neg] using hsplit.symm
 
 /-- **Manuscript Corollary 2.6 (curvature balance for log-concave weights).**
 Under the hypotheses of Theorem 2.5 and `V'' ≥ 0`, the sign of `κ_k` is exactly determined by
@@ -114,8 +115,10 @@ theorem CurvaturePairingHypotheses.momentCurvature_nonneg_iff_curvatureBalance
   have hC : 0 < momentC k := by
     rw [momentC_eq_A_add_two]
     exact momentA_pos (by omega)
-  have hden : 0 < 2 * momentB k * momentC k * I h k * I h (k + 1) := by
-    positivity
+  have hIk : 0 < I h k := h.momentPositive k
+  have hIk1 : 0 < I h (k + 1) := h.momentPositive (k + 1)
+  have hden : 0 < 2 * momentB k * momentC k * I h k * I h (k + 1) :=
+    mul_pos (mul_pos (mul_pos (mul_pos (by norm_num) hB) hC) hIk) hIk1
   have hcoef :
       0 < (2 * momentB k * momentC k * I h k * I h (k + 1))⁻¹ :=
     inv_pos.mpr hden
