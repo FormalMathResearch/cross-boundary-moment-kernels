@@ -223,6 +223,5 @@ theorem CurvaturePairingHypotheses.momentCurvature_eq_combinedTwoCopy
     ne_of_gt (h.momentPositive (k + 1)), ne_of_gt (momentA_pos H.index),
     ne_of_gt (show 0 < momentB k by rw [momentB]; positivity),
     ne_of_gt (show 0 < momentC k by rw [momentC]; positivity)]
-  ring
 
 end CrossBoundaryMomentKernels
