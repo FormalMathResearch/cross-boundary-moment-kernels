@@ -42,3 +42,4 @@ import CrossBoundaryMomentKernels.CurvatureTwoCopyManuscript
 import CrossBoundaryMomentKernels.CurvatureFTC
 import CrossBoundaryMomentKernels.CurvatureTonelli
 import CrossBoundaryMomentKernels.CurvatureEnvelopeIntegrability
+import CrossBoundaryMomentKernels.CurvatureAbsoluteTonelli
