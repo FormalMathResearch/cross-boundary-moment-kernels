@@ -2,7 +2,7 @@
 
 Manuscript basis: **Cross-Boundary Moment Kernels**, revised draft of 18 August 2026, pp. 7–8.
 
-This note records the theorem-by-theorem correspondence between the printed Gamma block and the Lean development.  Its purpose is to prevent a successful formal proof from being obtained by silently strengthening hypotheses, narrowing index ranges, or replacing a printed assertion by a nearby but different statement.
+This note records the theorem-by-theorem correspondence between the printed Gamma block and the Lean development. Its purpose is to prevent a successful formal proof from being obtained by silently strengthening hypotheses, narrowing index ranges, or replacing a printed assertion by a nearby but different statement.
 
 ## Theorem 2.7 — Gamma model and sharpness
 
@@ -19,7 +19,7 @@ It first states the moment and determinant identities without imposing the later
 
 Lean wrapper: `gamma_theorem_2_7_all_index`.
 
-This wrapper deliberately accepts arbitrary `k : ℕ`; it does **not** add `k ≥ 1`.  The determinant statement is used for `u > 0`, the manuscript domain of the canonical kernels.  The underlying lemma `gamma_K_eq` is slightly stronger and also covers `u = 0`.
+This wrapper deliberately accepts arbitrary `k : ℕ`; it does **not** add `k ≥ 1`. The determinant statement is used for `u > 0`, the manuscript domain of the canonical kernels. The underlying lemma `gamma_K_eq` is slightly stronger and also covers `u = 0`.
 
 The manuscript then says **for every `k ≥ 1`** that the unique crossing is
 
@@ -75,11 +75,11 @@ For `k ≥ 1`, the manuscript states
 
 Lean wrapper: `gamma_corollary_2_9`.
 
-The wrapper contains the two exact formulas, positivity under `a > 0`, and the explicit `a = 1` reversed-crossing witness.  No stronger regularity or positivity assumption is introduced.
+The wrapper contains the two exact formulas, positivity under `a > 0`, and the explicit `a = 1` reversed-crossing witness. No stronger regularity or positivity assumption is introduced.
 
 ## Proposition 2.10 — exact Gamma product law
 
-The manuscript range is `k ≥ 0`, `u > 0`.  If `(Y,Z) ~ ν_{k,u}` and `X = YZ`, it states
+The manuscript range is `k ≥ 0`, `u > 0`. If `(Y,Z) ~ ν_{k,u}` and `X = YZ`, it states
 
 `X/u ~ Γ(α_k, rate 1)`
 
@@ -94,7 +94,7 @@ The distributional conclusion is formalized as equality of pushforward probabili
 
 `(ν_{k,u}).map (X/u) = gammaMeasure α_k 1`.
 
-This is stronger than bare moment matching in the logically relevant sense: the proof first establishes the moment/MGF identities, then uses analytic continuation and characteristic-function uniqueness to identify the measures.
+This avoids the logical gap of inferring equality in distribution from moment matching alone: the formal proof first establishes the relevant moment/MGF identities and then uses analytic continuation together with characteristic-function uniqueness to identify the measures.
 
 The manuscript also prints the specialization at the canonical crossing
 
@@ -102,11 +102,11 @@ The manuscript also prints the specialization at the canonical crossing
 
 Lean theorem: `gamma_proposition_2_10_variance_at_crossing`.
 
-Here Lean makes `k ≥ 1` explicit because Theorem 2.7 introduces the canonical crossing only in that range.  This is an indexing clarification, not an extra mathematical hypothesis on Proposition 2.10 itself.
+Here Lean makes `k ≥ 1` explicit because Theorem 2.7 introduces the canonical crossing only in that range. This is an indexing clarification, not an extra mathematical hypothesis on Proposition 2.10 itself.
 
 ## Audit conclusion
 
-For pp. 7–8, the Lean wrappers now preserve the manuscript's mathematical content and index ranges theorem by theorem.  In particular:
+For pp. 7–8, the Lean wrappers now preserve the manuscript's mathematical content and index ranges theorem by theorem. In particular:
 
 1. the all-index `I_k` and `K_k` formulas are not artificially restricted to `k ≥ 1`;
 2. the crossing formulas retain exactly the manuscript restriction `k ≥ 1`;
@@ -114,4 +114,4 @@ For pp. 7–8, the Lean wrappers now preserve the manuscript's mathematical cont
 4. the exact Gamma product law is equality of probability distributions, not only equality of moments;
 5. the final variance-at-crossing clause records explicitly the index condition under which `u_k*` is defined in the manuscript.
 
-The Gamma block should be called **Lean-verified** only at a commit for which both `lake build --wfail` and `leanchecker` pass.  The next mathematical block after this audit is Theorem 2.5 / Corollary 2.6, the curvature-pairing argument with its boundary terms, weighted `V'` integrability, and absolute Tonelli/Fubini control.
+The Gamma block should be called **Lean-verified** only at a commit for which both `lake build --wfail` and `leanchecker` pass. The next mathematical block after this audit is Theorem 2.5 / Corollary 2.6, the curvature-pairing argument with its boundary terms, weighted `V'` integrability, and absolute Tonelli/Fubini control.
