@@ -4,6 +4,7 @@ import Mathlib.MeasureTheory.Integral.Prod
 noncomputable section
 
 open MeasureTheory Set Filter
+open scoped ENNReal
 
 namespace CrossBoundaryMomentKernels
 
@@ -25,6 +26,23 @@ theorem orderedSignedDensity_measurable
     measurability
   exact Measurable.ite hs
     ((hg.comp measurable_fst).mul (hq.comp measurable_snd)) measurable_const
+
+/-- The absolute norm of the signed ordered density is exactly the corresponding nonnegative
+Tonelli density.  This pointwise identity is the bridge by which the absolute Tonelli estimate
+will imply integrability before signed Fubini is invoked. -/
+theorem ofReal_norm_orderedSignedDensity_eq_orderedTonelliDensity
+    (g : ℝ × ℝ → ℝ) (q : ℝ → ℝ) (p : (ℝ × ℝ) × ℝ) :
+    ENNReal.ofReal ‖orderedSignedDensity g q p‖ =
+      orderedTonelliDensity
+        (fun x => ENNReal.ofReal |g x|)
+        (fun u => ENNReal.ofReal |q u|) p := by
+  unfold orderedSignedDensity orderedTonelliDensity
+  by_cases hp : 0 < p.1.1 ∧ p.1.1 < p.2 ∧ p.2 < p.1.2
+  · rw [if_pos hp, if_pos hp]
+    rw [Real.norm_eq_abs, abs_mul,
+      ENNReal.ofReal_mul (abs_nonneg (g p.1))]
+  · rw [if_neg hp, if_neg hp]
+    simp
 
 /-- For fixed `(y,z)` with `y>0`, integrating the signed triple density in the middle
 variable gives the signed integral over `y<u<z`. -/
