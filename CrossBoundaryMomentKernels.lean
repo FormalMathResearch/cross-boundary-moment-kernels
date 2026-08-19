@@ -31,3 +31,4 @@ import CrossBoundaryMomentKernels.GammaCorollaries
 import CrossBoundaryMomentKernels.GammaProductLaw
 import CrossBoundaryMomentKernels.GammaProductMGF
 import CrossBoundaryMomentKernels.GammaProductDistribution
+import CrossBoundaryMomentKernels.GammaManuscriptForm
