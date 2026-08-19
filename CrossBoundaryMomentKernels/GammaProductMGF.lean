@@ -52,6 +52,7 @@ theorem gammaMeasure_exp_integrable_of_lt_one {α t : ℝ} (hα : 0 < α) (ht : 
           field_simp [hrpow, hGamma]
         _ = (Real.Gamma α)⁻¹ * x ^ (α - 1) * Real.exp (-x) * Real.exp (t * x) := by
           rw [hexp]
+          ring
     · rw [ProbabilityTheory.gammaPDFReal, if_neg hx,
         ProbabilityTheory.gammaPDFReal, if_neg hx]
       simp
