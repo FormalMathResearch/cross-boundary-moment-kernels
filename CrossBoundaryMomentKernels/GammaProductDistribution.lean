@@ -32,9 +32,11 @@ theorem gammaNormalizedProduct_mgf_eventuallyEq
   simp only [zero_mul, Real.exp_zero, mul_one, id_eq] at hpsX hpsG
   have hseries :
       FormalMultilinearSeries.ofScalars ℝ
-          (fun n ↦ ((∫ p, gammaNormalizedProduct u p ^ n ∂μ) : ℝ) / n !) =
+          (fun n ↦ ((∫ p, gammaNormalizedProduct u p ^ n ∂μ) : ℝ) /
+            (Nat.factorial n : ℝ)) =
         FormalMultilinearSeries.ofScalars ℝ
-          (fun n ↦ ((∫ x : ℝ, x ^ n ∂ν) : ℝ) / n !) := by
+          (fun n ↦ ((∫ x : ℝ, x ^ n ∂ν) : ℝ) /
+            (Nat.factorial n : ℝ)) := by
     rw [FormalMultilinearSeries.ofScalars_series_eq_iff]
     funext n
     rw [gamma_normalizedProduct_moment_eq_gammaMeasure ha k n hu]
