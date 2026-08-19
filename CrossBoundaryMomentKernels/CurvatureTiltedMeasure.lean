@@ -106,7 +106,7 @@ theorem CurvaturePairingHypotheses.curvatureTilted_expectation_deriv
     filter_upwards [ae_restrict_mem measurableSet_Ioi] with y hy
     simp only [curvatureTiltedDensity, momentIntegrand, momentA, halfExponent,
       Real.rpow_eq_pow]
-    ring
+    ring_nf
   rw [integral_congr_ae hEq, integral_const_mul, H.ibp_at_A]
   rw [momentRatioScale]
   field_simp [ne_of_gt (h.momentPositive k), ne_of_gt (h.momentPositive (k - 1)),
@@ -115,7 +115,7 @@ theorem CurvaturePairingHypotheses.curvatureTilted_expectation_deriv
 /-- The manuscript identity `E_k[Y] = I_{k+1}/I_k = b_k s_{k+1}`. -/
 theorem CurvaturePairingHypotheses.curvatureTilted_expectation_id
     {h : FullSupportMomentWeight} {V : ℝ → ℝ} {k : ℕ}
-    (H : CurvaturePairingHypotheses h V k) :
+    (_H : CurvaturePairingHypotheses h V k) :
     ∫ y, y ∂curvatureTiltedMeasure h k =
       momentB k * momentRatioScale h (k + 1) := by
   rw [curvatureTilted_expectation_id_eq_I_ratio]
@@ -149,7 +149,7 @@ theorem CurvaturePairingHypotheses.curvatureTilted_expectation_id_mul_deriv
       _ = (I h k)⁻¹ * (y ^ momentB k * deriv V y * h y) := by
         simp only [momentIntegrand, halfExponent, momentB, Real.rpow_eq_pow]
         push_cast
-        ring
+        ring_nf
   rw [integral_congr_ae hEq, integral_const_mul, H.ibp_at_B]
   field_simp [ne_of_gt (h.momentPositive k)]
 
