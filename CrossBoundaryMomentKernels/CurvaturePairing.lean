@@ -1,7 +1,7 @@
 import CrossBoundaryMomentKernels.MomentCurvature
 import Mathlib.Analysis.Calculus.ContDiff.Deriv
 import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
-import Mathlib.MeasureTheory.Integral.IntervalIntegral.IntegrationByParts
+import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 
 noncomputable section
 
@@ -74,5 +74,99 @@ theorem CurvaturePairingHypotheses.hasDerivAt_weight
   calc
     -(Real.exp (-V x) * deriv V x) = -(deriv V x) * Real.exp (-V x) := by ring
     _ = -(deriv V x) * h x := by rw [hxEq]
+
+/-- The manuscript's absolute `V'` assumption implies integrability of the signed derivative
+term needed in integration by parts.  The only measurability input is the stated `C²` regularity
+and `h = exp(-V)` on `(0,∞)`. -/
+theorem CurvaturePairingHypotheses.weightedWeightDerivative_integrableOn
+    {h : FullSupportMomentWeight} {V : ℝ → ℝ} {k : ℕ}
+    (H : CurvaturePairingHypotheses h V k) {r : ℝ}
+    (Hr : CurvatureExponentHypotheses h V r) :
+    IntegrableOn (fun y : ℝ => y ^ r * (-(deriv V y) * h y)) (Ioi 0) := by
+  let f : ℝ → ℝ := fun y => y ^ r * (-(deriv V y) * h y)
+  let g : ℝ → ℝ := fun y => y ^ r * (-(deriv V y) * Real.exp (-V y))
+  have hderivCont : ContinuousOn (deriv V) (Ioi (0 : ℝ)) :=
+    H.smooth.continuousOn_deriv_of_isOpen isOpen_Ioi (by norm_num)
+  have hgCont : ContinuousOn g (Ioi (0 : ℝ)) := by
+    intro y hy
+    have hpow : ContinuousWithinAt (fun x : ℝ => x ^ r) (Ioi 0) y :=
+      (Real.continuousAt_rpow_const y r (.inl (ne_of_gt hy))).continuousWithinAt
+    have hV : ContinuousWithinAt V (Ioi 0) y := H.smooth.continuousOn y hy
+    exact hpow.mul ((hderivCont y hy).neg.mul hV.neg.exp)
+  have hfg : Set.EqOn f g (Ioi (0 : ℝ)) := by
+    intro y hy
+    have hyEq : h y = Real.exp (-V y) := H.weight_eq hy
+    simp only [f, g]
+    rw [hyEq]
+  have hgMeas : AEStronglyMeasurable g (volume.restrict (Ioi (0 : ℝ))) :=
+    hgCont.aestronglyMeasurable measurableSet_Ioi
+  have hfgAE : f =ᵐ[volume.restrict (Ioi (0 : ℝ))] g :=
+    (ae_restrict_iff' measurableSet_Ioi).2 (Eventually.of_forall hfg)
+  have hfMeas : AEStronglyMeasurable f (volume.restrict (Ioi (0 : ℝ))) :=
+    hgMeas.congr hfgAE.symm
+  have hnorm : IntegrableOn (fun y : ℝ => ‖f y‖) (Ioi 0) := by
+    refine Hr.2.2.congr_fun ?_ measurableSet_Ioi
+    intro y hy
+    have hpowNonneg : 0 ≤ y ^ r := Real.rpow_nonneg hy.le r
+    have hhNonneg : 0 ≤ h y := h.nonneg hy
+    simp [f, Real.norm_eq_abs, abs_mul, hpowNonneg, hhNonneg, mul_assoc]
+  exact (integrable_norm_iff hfMeas).mp hnorm
+
+/-- **Manuscript Lemma 5.1 (improper integration by parts).**
+For `r > 0`, the boundary limits, absolute weighted-`V'` integrability, and the finite
+`(r-1)` moment give exactly
+`∫₀∞ y^r V'(y) h(y) dy = r ∫₀∞ y^(r-1) h(y) dy`.
+The proof uses the improper integration-by-parts theorem on `(0,∞)`; its boundary terms are
+exactly the two limits assumed in the manuscript. -/
+theorem curvature_improper_integration_by_parts
+    {h : FullSupportMomentWeight} {V : ℝ → ℝ} {k : ℕ}
+    (H : CurvaturePairingHypotheses h V k) {r : ℝ} (hr : 0 < r)
+    (Hr : CurvatureExponentHypotheses h V r)
+    (hmoment : IntegrableOn (fun y : ℝ => y ^ (r - 1) * h y) (Ioi 0)) :
+    ∫ y in Ioi (0 : ℝ), y ^ r * deriv V y * h y =
+      r * ∫ y in Ioi (0 : ℝ), y ^ (r - 1) * h y := by
+  have hu : ∀ x ∈ Ioi (0 : ℝ),
+      HasDerivAt (fun y : ℝ => y ^ r) (r * x ^ (r - 1)) x := by
+    intro x hx
+    exact Real.hasDerivAt_rpow_const (.inl (ne_of_gt hx))
+  have hv : ∀ x ∈ Ioi (0 : ℝ),
+      HasDerivAt (fun y : ℝ => h y) (-(deriv V x) * h x) x := by
+    intro x hx
+    exact H.hasDerivAt_weight hx
+  have huv' : IntegrableOn
+      ((fun y : ℝ => y ^ r) * (fun y : ℝ => -(deriv V y) * h y)) (Ioi 0) := by
+    simpa only [Pi.mul_apply] using H.weightedWeightDerivative_integrableOn Hr
+  have hu'v : IntegrableOn
+      ((fun y : ℝ => r * y ^ (r - 1)) * (fun y : ℝ => h y)) (Ioi 0) := by
+    simpa only [Pi.mul_apply, mul_assoc] using hmoment.const_mul r
+  have hzero : Tendsto
+      ((fun y : ℝ => y ^ r) * (fun y : ℝ => h y)) (𝓝[>] (0 : ℝ)) (𝓝 0) := by
+    simpa only [Pi.mul_apply] using Hr.1
+  have hinfty : Tendsto
+      ((fun y : ℝ => y ^ r) * (fun y : ℝ => h y)) atTop (𝓝 0) := by
+    simpa only [Pi.mul_apply] using Hr.2.1
+  have hibp := MeasureTheory.integral_Ioi_mul_deriv_eq_deriv_mul
+    (a := (0 : ℝ)) (a' := (0 : ℝ)) (b' := (0 : ℝ))
+    hu hv huv' hu'v hzero hinfty
+  have hleft :
+      (∫ y in Ioi (0 : ℝ), y ^ r * (-(deriv V y) * h y)) =
+        -(∫ y in Ioi (0 : ℝ), y ^ r * deriv V y * h y) := by
+    rw [← integral_neg]
+    apply integral_congr_ae
+    filter_upwards with y
+    ring
+  have hright :
+      (∫ y in Ioi (0 : ℝ), (r * y ^ (r - 1)) * h y) =
+        r * ∫ y in Ioi (0 : ℝ), y ^ (r - 1) * h y := by
+    calc
+      (∫ y in Ioi (0 : ℝ), (r * y ^ (r - 1)) * h y) =
+          ∫ y in Ioi (0 : ℝ), r * (y ^ (r - 1) * h y) := by
+            apply integral_congr_ae
+            filter_upwards with y
+            ring
+      _ = r * ∫ y in Ioi (0 : ℝ), y ^ (r - 1) * h y := by
+        rw [integral_const_mul]
+  rw [hleft, hright] at hibp
+  linarith
 
 end CrossBoundaryMomentKernels
