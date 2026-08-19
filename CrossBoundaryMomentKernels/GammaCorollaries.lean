@@ -1,8 +1,11 @@
 import CrossBoundaryMomentKernels.MomentCurvature
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 import Mathlib.Analysis.Calculus.Deriv.Inv
+import Mathlib.Analysis.Convex.Deriv
 
 noncomputable section
+
+open Set
 
 namespace CrossBoundaryMomentKernels
 
@@ -86,6 +89,22 @@ theorem gammaLogProfile_second_derivative (a : ℝ) {y : ℝ} (hy : 0 < y) :
 theorem gammaLogProfile_second_derivative_neg {a y : ℝ} (ha : 0 < a) (hy : 0 < y) :
     -a / y ^ 2 < 0 := by
   exact div_neg_of_neg_of_pos (neg_neg_of_pos ha) (sq_pos_of_pos hy)
+
+/-- For `a>0`, `log h_a(y) = a log y - y` is strictly concave on `(0,∞)`. -/
+theorem gammaLogProfile_strictConcaveOn_Ioi {a : ℝ} (ha : 0 < a) :
+    StrictConcaveOn ℝ (Ioi (0 : ℝ)) (gammaLogProfile a) := by
+  have hcont : ContinuousOn (gammaLogProfile a) (Ioi (0 : ℝ)) := by
+    intro x hx
+    have hx0 : x ≠ 0 := ne_of_gt hx
+    unfold gammaLogProfile
+    exact (((Real.continuousAt_log hx0).const_mul a).sub continuousAt_id).continuousWithinAt
+  have hanti : StrictAntiOn (deriv (gammaLogProfile a)) (Ioi (0 : ℝ)) := by
+    intro x hx y hy hxy
+    rw [(gammaLogProfile_derivative a hx).deriv, (gammaLogProfile_derivative a hy).deriv]
+    have hquot : a / y < a / x := by
+      exact (div_lt_div_iff₀ hy hx).2 (mul_lt_mul_of_pos_left hxy ha)
+    linarith
+  exact hanti.strictConcaveOn_of_deriv convex_Ioi hcont
 
 /-- The concrete reversed-crossing example from manuscript Corollary 2.8. -/
 theorem gamma_a_one_reversed_crossing :
