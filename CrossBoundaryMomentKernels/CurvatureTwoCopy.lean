@@ -214,6 +214,9 @@ theorem CurvaturePairingHypotheses.integral_curvatureCovarianceTwoCopyKernel
         (∫ p, q1 p.1 * f0 p.2 ∂(μ.prod μ)) -
           ∫ p, f1 p.1 * q0 p.2 ∂(μ.prod μ) := by
     simpa only [Pi.sub_apply] using integral_sub h1 h2
+  change
+    (∫ p, q1 p.1 * f0 p.2 - f1 p.1 * q0 p.2 - q0 p.1 * f1 p.2 +
+        f0 p.1 * q1 p.2 ∂(μ.prod μ)) = _
   rw [hadd, hsub3, hsub2]
   simp only [integral_prod_mul]
   change
