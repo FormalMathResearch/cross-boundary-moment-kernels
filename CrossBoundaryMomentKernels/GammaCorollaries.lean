@@ -1,5 +1,6 @@
 import CrossBoundaryMomentKernels.MomentCurvature
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv
+import Mathlib.Analysis.Calculus.Deriv.Inv
 
 noncomputable section
 
@@ -36,7 +37,10 @@ theorem gamma_momentCurvature_eq {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (
   have h1 : (k : ℝ) - 1 / 2 ≠ 0 := by linarith
   have h2 : (k : ℝ) + 1 - 1 / 2 ≠ 0 := by linarith
   have h3 : (k : ℝ) + 2 - 1 / 2 ≠ 0 := by linarith
-  field_simp [h1, h2, h3]
+  have hd1 : (2 : ℝ) * (k : ℝ) - 1 ≠ 0 := by linarith
+  have hd2 : (2 : ℝ) * (k : ℝ) + 1 ≠ 0 := by linarith
+  have hd3 : (2 : ℝ) * (k : ℝ) + 3 ≠ 0 := by linarith
+  field_simp [h1, h2, h3, hd1, hd2, hd3]
   ring
 
 /-- Positive Gamma shape parameter gives strictly positive relative moment curvature. -/
@@ -44,19 +48,32 @@ theorem gamma_momentCurvature_pos {a : ℝ} (ha : 0 < a) {k : ℕ} (hk : 1 ≤ k
     0 < momentCurvature (gammaFullSupportWeight a (by linarith)) k := by
   rw [gamma_momentCurvature_eq (by linarith) hk]
   have hkR : (1 : ℝ) ≤ (k : ℝ) := by exact_mod_cast hk
+  have h1 : 0 < (2 : ℝ) * (k : ℝ) - 1 := by linarith
+  have h2 : 0 < (2 : ℝ) * (k : ℝ) + 1 := by linarith
+  have h3 : 0 < (2 : ℝ) * (k : ℝ) + 3 := by linarith
   have hden :
       0 < ((2 : ℝ) * (k : ℝ) - 1) * ((2 : ℝ) * (k : ℝ) + 1) *
-        ((2 : ℝ) * (k : ℝ) + 3) := by positivity
+        ((2 : ℝ) * (k : ℝ) + 3) := mul_pos (mul_pos h1 h2) h3
   exact div_pos (mul_pos (by norm_num) ha) hden
 
 /-- Logarithmic profile of the Gamma weight on the positive half-line. -/
 def gammaLogProfile (a y : ℝ) : ℝ := a * Real.log y - y
 
+/-- The derivative of the logarithmic Gamma profile is `a/y - 1`. -/
+theorem gammaLogProfile_derivative (a : ℝ) {y : ℝ} (hy : 0 < y) :
+    HasDerivAt (gammaLogProfile a) (a / y - 1) y := by
+  have hy0 : y ≠ 0 := ne_of_gt hy
+  rw [gammaLogProfile]
+  convert (Real.hasDerivAt_log hy0).const_mul a |>.sub (hasDerivAt_id y) using 1 <;>
+    field_simp [hy0] <;> ring
+
 /-- The logarithmic Gamma profile has second derivative `-a/y²`. -/
 theorem gammaLogProfile_second_derivative (a : ℝ) {y : ℝ} (hy : 0 < y) :
     HasDerivAt (fun x => a / x - 1) (-a / y ^ 2) y := by
   have hy0 : y ≠ 0 := ne_of_gt hy
-  convert (hasDerivAt_const_div y a).sub_const 1 using 1 <;> field_simp [hy0] <;> ring
+  have hinv : HasDerivAt (fun x : ℝ => x⁻¹) (-(y ^ 2)⁻¹) y := hasDerivAt_inv hy0
+  convert hinv.const_mul a |>.sub_const 1 using 1 <;>
+    field_simp [hy0] <;> ring
 
 /-- For `a>0`, the logarithmic Gamma profile has strictly negative second derivative. -/
 theorem gammaLogProfile_second_derivative_neg {a y : ℝ} (ha : 0 < a) (hy : 0 < y) :
