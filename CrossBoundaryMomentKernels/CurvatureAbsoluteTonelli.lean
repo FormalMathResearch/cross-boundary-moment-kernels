@@ -80,13 +80,15 @@ theorem curvatureEnvelopeTonelliDensity_slice_eq_ofReal_envelope
         ∂(volume.prod volume)) = _
     simp_rw [ENNReal.ofReal_mul (by norm_num : (0 : ℝ) ≤ 2), ENNReal.ofReal_ofNat]
     rw [lintegral_const_mul]
-    exact hbase.aemeasurable
+    exact hbase
   have hrep :
       (∫⁻ p : ℝ × ℝ in Ioc (0 : ℝ) u ×ˢ Ioi u,
           base p ∂(volume.prod volume)) =
         ∫⁻ p : ℝ × ℝ in Ioc (0 : ℝ) u ×ˢ Ioi u,
           ENNReal.ofReal (curvatureEnvelopeDensity h k p) ∂(volume.prod volume) := by
     apply lintegral_congr_ae
+    change ∀ᵐ p ∂(volume.prod volume).restrict (Ioc (0 : ℝ) u ×ˢ Ioi u),
+      base p = ENNReal.ofReal (curvatureEnvelopeDensity h k p)
     rw [ae_restrict_iff' (measurableSet_Ioc.prod measurableSet_Ioi)]
     filter_upwards with p hp
     have hy : 0 < p.1 := hp.1.1
@@ -145,8 +147,9 @@ theorem CurvaturePairingHypotheses.absoluteTonelli_lintegral
       · rw [if_pos hy, if_pos hy]
         have hsub : Ioc p.1 p.2 ⊆ Ioi (0 : ℝ) := by
           intro u hu
-          exact lt_of_lt_of_le hy hu.1
+          exact lt_trans hy hu.1
         have heq : q0 =ᵐ[volume.restrict (Ioc p.1 p.2)] q := by
+          change ∀ᵐ u ∂volume.restrict (Ioc p.1 p.2), q0 u = q u
           rw [ae_restrict_iff' measurableSet_Ioc]
           filter_upwards [hqImp] with u huq hu
           exact huq (hsub hu)
@@ -165,9 +168,8 @@ theorem CurvaturePairingHypotheses.absoluteTonelli_lintegral
       by_cases hu : 0 < u
       · rw [if_pos hu, curvatureEnvelopeTonelliDensity_slice_eq_ofReal_envelope h k hu,
           huq hu]
-      · have heu : Ioc (0 : ℝ) u = ∅ := by
-          exact Ioc_eq_empty (not_lt.mp hu)
-        simp [hu, heu]
+      · rw [if_neg hu]
+        simp [Ioc_eq_empty hu]
     _ = ∫⁻ u : ℝ,
         (if 0 < u then
           ENNReal.ofReal (curvatureEnvelope h k u) *
