@@ -15,23 +15,31 @@ theorem gamma_uStar_eq_iff_threshold
       a = (4 * (k : ℝ) ^ 2 - 1) / 8 := by
   rw [gamma_uStar_eq ha hk, gamma_uStar_eq ha (by omega)]
   have hkR : (1 : ℝ) ≤ (k : ℝ) := by exact_mod_cast hk
-  have hden :
-      (((2 : ℝ) * (k : ℝ) - 1) * ((2 : ℝ) * (k : ℝ) + 1)) ≠ 0 := by
+  let D : ℝ := ((2 : ℝ) * (k : ℝ) - 1) * ((2 : ℝ) * (k : ℝ) + 1)
+  have hD : D ≠ 0 := by
+    dsimp [D]
     have h1 : 0 < (2 : ℝ) * (k : ℝ) - 1 := by linarith
     have h2 : 0 < (2 : ℝ) * (k : ℝ) + 1 := by linarith
     exact ne_of_gt (mul_pos h1 h2)
   constructor
   · intro heq
-    have hdiff : gammaCrossing a (k + 1) - gammaCrossing a k = 0 := by
+    have hdiff :
+        (4 * (k : ℝ) ^ 2 - 8 * a - 1) / D = 0 := by
+      rw [← gammaCrossing_succ_sub (a := a) hk]
       linarith
-    rw [gammaCrossing_succ_sub hk] at hdiff
-    field_simp [hden] at hdiff
+    have hmul := congrArg (fun x : ℝ => x * D) hdiff
+    rw [div_mul_cancel₀ _ hD, zero_mul] at hmul
+    rw [eq_div_iff (by norm_num : (8 : ℝ) ≠ 0)]
     linarith
   · intro haeq
+    have ha8 : a * 8 = 4 * (k : ℝ) ^ 2 - 1 := by
+      exact (eq_div_iff (by norm_num : (8 : ℝ) ≠ 0)).mp haeq
+    have hnum : 4 * (k : ℝ) ^ 2 - 8 * a - 1 = 0 := by
+      linarith
     have hdiff : gammaCrossing a (k + 1) - gammaCrossing a k = 0 := by
       rw [gammaCrossing_succ_sub hk]
-      field_simp [hden]
-      linarith
+      change (4 * (k : ℝ) ^ 2 - 8 * a - 1) / D = 0
+      rw [hnum, zero_div]
     linarith
 
 /-- Reversed adjacent crossing order occurs exactly above the sharp threshold. -/
