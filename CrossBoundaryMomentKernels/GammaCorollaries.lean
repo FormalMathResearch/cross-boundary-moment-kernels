@@ -40,7 +40,10 @@ theorem gamma_momentCurvature_eq {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (
   have hd1 : (2 : ℝ) * (k : ℝ) - 1 ≠ 0 := by linarith
   have hd2 : (2 : ℝ) * (k : ℝ) + 1 ≠ 0 := by linarith
   have hd3 : (2 : ℝ) * (k : ℝ) + 3 ≠ 0 := by linarith
-  field_simp [h1, h2, h3, hd1, hd2, hd3]
+  have he1 : (-1 : ℝ) + (k : ℝ) * 2 ≠ 0 := by linarith
+  have he2 : (1 : ℝ) + (k : ℝ) * 2 ≠ 0 := by linarith
+  have he3 : (3 : ℝ) + (k : ℝ) * 2 ≠ 0 := by linarith
+  field_simp [h1, h2, h3, hd1, hd2, hd3, he1, he2, he3]
   ring
 
 /-- Positive Gamma shape parameter gives strictly positive relative moment curvature. -/
@@ -63,17 +66,16 @@ def gammaLogProfile (a y : ℝ) : ℝ := a * Real.log y - y
 theorem gammaLogProfile_derivative (a : ℝ) {y : ℝ} (hy : 0 < y) :
     HasDerivAt (gammaLogProfile a) (a / y - 1) y := by
   have hy0 : y ≠ 0 := ne_of_gt hy
-  rw [gammaLogProfile]
-  convert (Real.hasDerivAt_log hy0).const_mul a |>.sub (hasDerivAt_id y) using 1 <;>
-    field_simp [hy0] <;> ring
+  change HasDerivAt (fun x : ℝ => a * Real.log x - x) (a / y - 1) y
+  simpa [div_eq_mul_inv] using
+    ((Real.hasDerivAt_log hy0).const_mul a).sub (hasDerivAt_id y)
 
 /-- The logarithmic Gamma profile has second derivative `-a/y²`. -/
 theorem gammaLogProfile_second_derivative (a : ℝ) {y : ℝ} (hy : 0 < y) :
     HasDerivAt (fun x => a / x - 1) (-a / y ^ 2) y := by
   have hy0 : y ≠ 0 := ne_of_gt hy
   have hinv : HasDerivAt (fun x : ℝ => x⁻¹) (-(y ^ 2)⁻¹) y := hasDerivAt_inv hy0
-  convert hinv.const_mul a |>.sub_const 1 using 1 <;>
-    field_simp [hy0] <;> ring
+  simpa [div_eq_mul_inv] using (hinv.const_mul a).sub_const 1
 
 /-- For `a>0`, the logarithmic Gamma profile has strictly negative second derivative. -/
 theorem gammaLogProfile_second_derivative_neg {a y : ℝ} (ha : 0 < a) (hy : 0 < y) :
