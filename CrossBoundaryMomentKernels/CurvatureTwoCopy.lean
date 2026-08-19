@@ -35,8 +35,8 @@ theorem CurvaturePairingHypotheses.momentIntegrand_mul_deriv_integrable_at_A
   have hneg := hn.neg
   refine hneg.congr ?_
   filter_upwards [ae_restrict_mem measurableSet_Ioi] with y hy
-  simp only [Pi.neg_apply, momentIntegrand, halfExponent, momentA]
-  ring
+  simp only [Pi.neg_apply, momentIntegrand, halfExponent, momentA, Real.rpow_eq_pow]
+  ring_nf
 
 /-- Absolute weighted-derivative integrability at `b_k`, written in moment-integrand form. -/
 theorem CurvaturePairingHypotheses.momentIntegrand_mul_deriv_integrable_at_B
@@ -48,8 +48,8 @@ theorem CurvaturePairingHypotheses.momentIntegrand_mul_deriv_integrable_at_B
   have hneg := hn.neg
   refine hneg.congr ?_
   filter_upwards [ae_restrict_mem measurableSet_Ioi] with y hy
-  simp only [Pi.neg_apply, momentIntegrand, halfExponent_succ_eq_momentB]
-  ring
+  simp only [Pi.neg_apply, momentIntegrand, halfExponent_succ_eq_momentB, Real.rpow_eq_pow]
+  ring_nf
 
 /-- Absolute weighted-derivative integrability at `c_k`, written in moment-integrand form. -/
 theorem CurvaturePairingHypotheses.momentIntegrand_mul_deriv_integrable_at_C
@@ -61,8 +61,8 @@ theorem CurvaturePairingHypotheses.momentIntegrand_mul_deriv_integrable_at_C
   have hneg := hn.neg
   refine hneg.congr ?_
   filter_upwards [ae_restrict_mem measurableSet_Ioi] with y hy
-  simp only [Pi.neg_apply, momentIntegrand, halfExponent_add_two_eq_momentC]
-  ring
+  simp only [Pi.neg_apply, momentIntegrand, halfExponent_add_two_eq_momentC, Real.rpow_eq_pow]
+  ring_nf
 
 /-- The `a_k` integration-by-parts identity in moment-integrand notation. -/
 theorem CurvaturePairingHypotheses.integral_momentIntegrand_mul_deriv_at_A
@@ -77,8 +77,8 @@ theorem CurvaturePairingHypotheses.integral_momentIntegrand_mul_deriv_at_A
         ∫ y in Ioi (0 : ℝ), y ^ momentA k * deriv V y * h y := by
           apply integral_congr_ae
           filter_upwards [ae_restrict_mem measurableSet_Ioi] with y hy
-          simp only [momentIntegrand, halfExponent, momentA]
-          ring
+          simp only [momentIntegrand, halfExponent, momentA, Real.rpow_eq_pow]
+          ring_nf
     _ = momentA k * I h (k - 1) := H.ibp_at_A
 
 /-- The `b_k` integration-by-parts identity in moment-integrand notation. -/
@@ -94,8 +94,8 @@ theorem CurvaturePairingHypotheses.integral_momentIntegrand_mul_deriv_at_B
         ∫ y in Ioi (0 : ℝ), y ^ momentB k * deriv V y * h y := by
           apply integral_congr_ae
           filter_upwards [ae_restrict_mem measurableSet_Ioi] with y hy
-          simp only [momentIntegrand, halfExponent_succ_eq_momentB]
-          ring
+          simp only [momentIntegrand, halfExponent_succ_eq_momentB, Real.rpow_eq_pow]
+          ring_nf
     _ = momentB k * I h k := H.ibp_at_B
 
 /-- The `c_k` integration-by-parts identity in moment-integrand notation. -/
@@ -111,8 +111,8 @@ theorem CurvaturePairingHypotheses.integral_momentIntegrand_mul_deriv_at_C
         ∫ y in Ioi (0 : ℝ), y ^ momentC k * deriv V y * h y := by
           apply integral_congr_ae
           filter_upwards [ae_restrict_mem measurableSet_Ioi] with y hy
-          simp only [momentIntegrand, halfExponent_add_two_eq_momentC]
-          ring
+          simp only [momentIntegrand, halfExponent_add_two_eq_momentC, Real.rpow_eq_pow]
+          ring_nf
     _ = momentC k * I h (k + 1) := H.ibp_at_C
 
 private lemma ae_positive_prod :
@@ -187,7 +187,10 @@ theorem CurvaturePairingHypotheses.integral_curvatureCovarianceTwoCopyKernel
     rw [hsY, hsZ]
     ring
   rw [← integral_congr_ae hEq]
-  dsimp [E]
+  change
+    ∫ p,
+      (((fun p : ℝ × ℝ => q1 p.1 * f0 p.2) - (fun p => f1 p.1 * q0 p.2) -
+        (fun p => q0 p.1 * f1 p.2) + (fun p => f0 p.1 * q1 p.2)) p) ∂(μ.prod μ) = _
   rw [integral_add ((h1.sub h2).sub h3) h4, integral_sub (h1.sub h2) h3,
     integral_sub h1 h2]
   simp only [integral_prod_mul]
@@ -217,6 +220,5 @@ theorem CurvaturePairingHypotheses.curvatureCovariance_eq_twoCopy
   rw [hk]
   field_simp [ne_of_gt (h.momentPositive k), ne_of_gt (h.momentPositive (k - 1)),
     ne_of_gt (momentA_pos H.index), ne_of_gt (show 0 < momentB k by rw [momentB]; positivity)]
-  ring
 
 end CrossBoundaryMomentKernels
