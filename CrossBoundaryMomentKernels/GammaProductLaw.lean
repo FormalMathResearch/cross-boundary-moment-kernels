@@ -102,7 +102,8 @@ theorem gammaMeasure_moment {α : ℝ} (hα : 0 < α) (m : ℕ) :
       rw [integral_Ici_eq_integral_Ioi]
       apply setIntegral_congr_fun measurableSet_Ioi
       intro x hx
-      simp only [ProbabilityTheory.gammaPDFReal, if_pos hx.le, one_rpow, one_mul]
+      change 0 < x at hx
+      simp [ProbabilityTheory.gammaPDFReal, hx.le]
       rw [show α + (m : ℝ) - 1 = (α - 1) + (m : ℝ) by ring,
         Real.rpow_add hx, Real.rpow_natCast]
       ring
