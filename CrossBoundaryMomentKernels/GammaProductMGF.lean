@@ -114,7 +114,6 @@ lemma gammaMomentIntegrand_mul_exp_half_integrable_Ioi
   rw [show gammaAlpha a j = α by rfl]
   simp [ProbabilityTheory.gammaPDFReal, hz0.le]
   field_simp [hGamma]
-  ring
 
 /-- Under the Gamma cross-boundary law, the normalized product `X/u` is nonnegative almost surely. -/
 lemma gammaNormalizedProduct_nonneg_ae
@@ -254,5 +253,29 @@ theorem gammaNormalizedProduct_exp_half_integrable
   apply hbase.congr
   filter_upwards [crossBoundaryDensity_nonneg_ae h k hu] with p hp
   simp [ENNReal.toReal_ofReal hp, smul_eq_mul]
+
+/-- The open interval `(-1/2,1/2)` lies inside the MGF domain of the normalized product. -/
+lemma gammaNormalizedProduct_Ioo_subset_interior_integrableExpSet
+    {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (k : ℕ) {u : ℝ} (hu : 0 < u) :
+    Ioo (-(1 / 2 : ℝ)) (1 / 2 : ℝ) ⊆
+      interior (ProbabilityTheory.integrableExpSet (gammaNormalizedProduct u)
+        (crossBoundaryMeasure (gammaFullSupportWeight a ha) k u)) := by
+  apply interior_maximal
+  · intro t ht
+    exact ProbabilityTheory.integrable_exp_mul_of_le_of_le
+      (gammaNormalizedProduct_exp_neg_half_integrable ha k hu)
+      (gammaNormalizedProduct_exp_half_integrable ha k hu) ht.1.le ht.2.le
+  · exact isOpen_Ioo
+
+/-- The same interval lies inside the MGF domain of every positive-shape unit-rate Gamma law. -/
+lemma gammaMeasure_Ioo_subset_interior_integrableExpSet
+    {α : ℝ} (hα : 0 < α) :
+    Ioo (-(1 / 2 : ℝ)) (1 / 2 : ℝ) ⊆
+      interior (ProbabilityTheory.integrableExpSet id
+        (ProbabilityTheory.gammaMeasure α 1)) := by
+  apply interior_maximal
+  · intro t ht
+    simpa using gammaMeasure_exp_integrable_of_lt_one hα (show t < 1 by linarith [ht.2])
+  · exact isOpen_Ioo
 
 end CrossBoundaryMomentKernels
