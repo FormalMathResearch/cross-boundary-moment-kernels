@@ -41,15 +41,16 @@ theorem gammaMeasure_exp_integrable_of_lt_one {α t : ℝ} (hα : 0 < α) (ht : 
     · rw [ProbabilityTheory.gammaPDFReal, if_pos hx,
         ProbabilityTheory.gammaPDFReal, if_pos hx]
       simp
+      have hexp : Real.exp (-(r * x)) = Real.exp (-x) * Real.exp (t * x) := by
+        rw [← Real.exp_add]
+        congr 1
+        dsimp [r]
+        ring
       calc
         (r ^ α)⁻¹ * (r ^ α / Real.Gamma α * x ^ (α - 1) * Real.exp (-(r * x))) =
             (Real.Gamma α)⁻¹ * x ^ (α - 1) * Real.exp (-(r * x)) := by
           field_simp [hrpow, hGamma]
         _ = (Real.Gamma α)⁻¹ * x ^ (α - 1) * Real.exp (-x) * Real.exp (t * x) := by
-          rw [← Real.exp_add]
-          have hexp : -(r * x) = -x + t * x := by
-            dsimp [r]
-            ring
           rw [hexp]
     · rw [ProbabilityTheory.gammaPDFReal, if_neg hx,
         ProbabilityTheory.gammaPDFReal, if_neg hx]
@@ -97,7 +98,7 @@ theorem gammaNormalizedProduct_exp_neg_half_integrable
   have hmeas : AEStronglyMeasurable
       (fun p => Real.exp (-(1 / 2 : ℝ) * gammaNormalizedProduct u p))
       (crossBoundaryMeasure (gammaFullSupportWeight a ha) k u) := by
-    exact (measurable_exp.comp
+    exact (Real.measurable_exp.comp
       (measurable_const.mul (gammaNormalizedProduct_measurable u))).aestronglyMeasurable
   refine hconst.mono hmeas ?_
   filter_upwards [gammaNormalizedProduct_nonneg_ae ha k hu] with p hp
