@@ -126,4 +126,20 @@ theorem lintegral_ordered_moving_domain
       intro u
       exact lintegral_orderedTonelliDensity_pair hg u
 
+/-- Lebesgue-null endpoints may be restored to match the manuscript convention `0 < y ≤ u`
+and `y < u ≤ z`.  This is the same Tonelli identity, now written with `Ioc`, exactly as in
+`curvatureEnvelope`. -/
+theorem lintegral_ordered_moving_domain_Ioc
+    {g : ℝ × ℝ → ℝ≥0∞} {q : ℝ → ℝ≥0∞}
+    (hg : Measurable g) (hq : Measurable q) :
+    (∫⁻ p : ℝ × ℝ,
+        (if 0 < p.1 then
+          g p * ∫⁻ u : ℝ in Ioc p.1 p.2, q u ∂volume
+        else 0) ∂(volume.prod volume)) =
+      ∫⁻ u : ℝ,
+        (∫⁻ y : ℝ in Ioc 0 u, ∫⁻ z : ℝ in Ioi u, g (y, z) ∂volume ∂volume) * q u
+        ∂volume := by
+  simpa only [MeasureTheory.restrict_Ioo_eq_restrict_Ioc] using
+    (lintegral_ordered_moving_domain hg hq)
+
 end CrossBoundaryMomentKernels
