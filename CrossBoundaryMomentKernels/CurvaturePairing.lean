@@ -92,7 +92,9 @@ theorem CurvaturePairingHypotheses.weightedWeightDerivative_integrableOn
     have hpow : ContinuousWithinAt (fun x : ℝ => x ^ r) (Ioi 0) y :=
       (Real.continuousAt_rpow_const y r (.inl (ne_of_gt hy))).continuousWithinAt
     have hV : ContinuousWithinAt V (Ioi 0) y := H.smooth.continuousOn y hy
-    exact hpow.mul ((hderivCont y hy).neg.mul hV.neg.exp)
+    have hexpV : ContinuousWithinAt (fun x : ℝ => Real.exp (-V x)) (Ioi 0) y :=
+      Real.continuous_exp.continuousAt.comp_continuousWithinAt y hV.neg
+    exact hpow.mul ((hderivCont y hy).neg.mul hexpV)
   have hfg : Set.EqOn f g (Ioi (0 : ℝ)) := by
     intro y hy
     have hyEq : h y = Real.exp (-V y) := H.weight_eq hy
@@ -109,7 +111,9 @@ theorem CurvaturePairingHypotheses.weightedWeightDerivative_integrableOn
     intro y hy
     have hpowNonneg : 0 ≤ y ^ r := Real.rpow_nonneg hy.le r
     have hhNonneg : 0 ≤ h y := h.nonneg hy
-    simp [f, Real.norm_eq_abs, abs_mul, hpowNonneg, hhNonneg, mul_assoc]
+    change y ^ r * |deriv V y| * h y = |y ^ r * (-(deriv V y) * h y)|
+    rw [abs_mul, abs_mul, abs_neg, abs_of_nonneg hpowNonneg, abs_of_nonneg hhNonneg]
+    ring
   exact (integrable_norm_iff hfMeas).mp hnorm
 
 /-- **Manuscript Lemma 5.1 (improper integration by parts).**
@@ -135,16 +139,21 @@ theorem curvature_improper_integration_by_parts
     exact H.hasDerivAt_weight hx
   have huv' : IntegrableOn
       ((fun y : ℝ => y ^ r) * (fun y : ℝ => -(deriv V y) * h y)) (Ioi 0) := by
-    simpa only [Pi.mul_apply] using H.weightedWeightDerivative_integrableOn Hr
+    change IntegrableOn (fun y : ℝ => y ^ r * (-(deriv V y) * h y)) (Ioi 0)
+    exact H.weightedWeightDerivative_integrableOn Hr
   have hu'v : IntegrableOn
       ((fun y : ℝ => r * y ^ (r - 1)) * (fun y : ℝ => h y)) (Ioi 0) := by
-    simpa only [Pi.mul_apply, mul_assoc] using hmoment.const_mul r
+    change IntegrableOn (fun y : ℝ => (r * y ^ (r - 1)) * h y) (Ioi 0)
+    simpa only [mul_assoc] using hmoment.const_mul r
   have hzero : Tendsto
-      ((fun y : ℝ => y ^ r) * (fun y : ℝ => h y)) (𝓝[>] (0 : ℝ)) (𝓝 0) := by
-    simpa only [Pi.mul_apply] using Hr.1
+      ((fun y : ℝ => y ^ r) * (fun y : ℝ => h y))
+      (nhdsWithin 0 (Ioi 0)) (nhds 0) := by
+    change Tendsto (fun y : ℝ => y ^ r * h y) (nhdsWithin 0 (Ioi 0)) (nhds 0)
+    exact Hr.1
   have hinfty : Tendsto
-      ((fun y : ℝ => y ^ r) * (fun y : ℝ => h y)) atTop (𝓝 0) := by
-    simpa only [Pi.mul_apply] using Hr.2.1
+      ((fun y : ℝ => y ^ r) * (fun y : ℝ => h y)) atTop (nhds 0) := by
+    change Tendsto (fun y : ℝ => y ^ r * h y) atTop (nhds 0)
+    exact Hr.2.1
   have hibp := MeasureTheory.integral_Ioi_mul_deriv_eq_deriv_mul
     (a := (0 : ℝ)) (a' := (0 : ℝ)) (b' := (0 : ℝ))
     hu hv huv' hu'v hzero hinfty
