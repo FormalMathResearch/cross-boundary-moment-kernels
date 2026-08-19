@@ -133,7 +133,7 @@ theorem CurvaturePairingHypotheses.twoCopyIntegral_eq_ordered_signedFTC
         rw [Set.indicator_of_mem hpos, Set.indicator_of_mem hup]
         dsimp [f]
         exact H.two_mul_twoCopy_eq_signedFTC hy hyz
-      · simp [Set.indicator, curvatureUpperHalf, hyz, Ioc_eq_empty hyz]
+      · simp [Set.indicator, curvatureUpperHalf, hyz]
     · rw [if_neg hy]
       have hnotpos : p ∉ Ioi (0 : ℝ) ×ˢ Ioi (0 : ℝ) := by
         intro hp
