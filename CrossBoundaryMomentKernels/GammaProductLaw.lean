@@ -117,4 +117,58 @@ theorem gammaMeasure_moment {α : ℝ} (hα : 0 < α) (m : ℕ) :
       rw [(Real.Gamma_eq_integral (by positivity : 0 < α + m)).symm]
       ring
 
+/-- The normalized cross-boundary product and the unit-rate Gamma law have identical
+integer moments. This is the moment-matching step in manuscript Proposition 2.10. -/
+theorem gamma_normalizedProduct_moment_eq_gammaMeasure
+    {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (k m : ℕ) {u : ℝ} (hu : 0 < u) :
+    ∫ p, (gammaNormalizedProduct u p) ^ m
+        ∂crossBoundaryMeasure (gammaFullSupportWeight a ha) k u =
+      ∫ x : ℝ, x ^ m ∂ProbabilityTheory.gammaMeasure (gammaAlpha a k) 1 := by
+  rw [gamma_normalizedProduct_moment ha k m hu,
+    gammaMeasure_moment (gammaAlpha_pos ha k) m,
+    gammaAlpha_add_index]
+
+/-- The exact product mean in the Gamma family: `E[X] = α_k u`. -/
+theorem gamma_crossBoundaryMean_eq
+    {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (k : ℕ) {u : ℝ} (hu : 0 < u) :
+    crossBoundaryMean (gammaFullSupportWeight a ha) k u = gammaAlpha a k * u := by
+  have hK : K (gammaFullSupportWeight a ha) k u ≠ 0 :=
+    ne_of_gt (K_pos (gammaFullSupportWeight a ha) k hu)
+  rw [crossBoundaryMean_eq_K_ratio (gammaFullSupportWeight a ha) k hu,
+    gamma_K_succ_eq ha k hu]
+  field_simp [hK]
+
+/-- The exact product variance in the Gamma family: `Var(X) = α_k u²`. -/
+theorem gamma_crossBoundaryVariance_eq
+    {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (k : ℕ) {u : ℝ} (hu : 0 < u) :
+    crossBoundaryVariance (gammaFullSupportWeight a ha) k u =
+      gammaAlpha a k * u ^ 2 := by
+  have hα : gammaAlpha a k ≠ 0 := ne_of_gt (gammaAlpha_pos ha k)
+  have hu0 : u ≠ 0 := ne_of_gt hu
+  have hdrift := crossBoundaryMean_succ_sub_eq_variance_div_mean
+    (gammaFullSupportWeight a ha) k hu
+  rw [gamma_crossBoundaryMean_eq ha k hu,
+    gamma_crossBoundaryMean_eq ha (k + 1) hu,
+    gammaAlpha_succ] at hdrift
+  have hden : gammaAlpha a k * u ≠ 0 := mul_ne_zero hα hu0
+  rw [div_eq_iff hden] at hdrift
+  calc
+    crossBoundaryVariance (gammaFullSupportWeight a ha) k u =
+        ((gammaAlpha a k + 1) * u - gammaAlpha a k * u) *
+          (gammaAlpha a k * u) := hdrift.symm
+    _ = gammaAlpha a k * u ^ 2 := by ring
+
+/-- At the canonical Gamma crossing, the product variance is exactly `τ_k² / α_k`. -/
+theorem gamma_crossBoundaryVariance_at_uStar
+    {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (hk : 1 ≤ k) :
+    crossBoundaryVariance (gammaFullSupportWeight a ha) k
+        (uStar (gammaFullSupportWeight a ha) k) =
+      (tau (gammaFullSupportWeight a ha) k) ^ 2 / gammaAlpha a k := by
+  rw [gamma_uStar_eq ha hk,
+    gamma_crossBoundaryVariance_eq ha k (gammaCrossing_pos ha hk),
+    gamma_tau_eq ha hk]
+  have hα : gammaAlpha a k ≠ 0 := ne_of_gt (gammaAlpha_pos ha k)
+  field_simp [hα]
+  ring
+
 end CrossBoundaryMomentKernels
