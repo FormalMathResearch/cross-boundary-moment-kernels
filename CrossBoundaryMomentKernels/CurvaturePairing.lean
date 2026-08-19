@@ -1,4 +1,7 @@
 import CrossBoundaryMomentKernels.MomentCurvature
+import Mathlib.Analysis.Calculus.ContDiff.Deriv
+import Mathlib.Analysis.SpecialFunctions.Pow.Deriv
+import Mathlib.MeasureTheory.Integral.IntervalIntegral.IntegrationByParts
 
 noncomputable section
 
@@ -44,5 +47,27 @@ structure CurvaturePairingHypotheses
     IntegrableOn
       (fun u : ℝ => |deriv (deriv V) u| * curvatureEnvelope h k u)
       (Ioi 0)
+
+/-- The differential identity `h' = -V' h` used in Lemma 5.1, derived from the manuscript
+assumptions `h = exp(-V)` and `V ∈ C²(0,∞)`.  No differentiability of `h` is added as an
+independent hypothesis. -/
+theorem CurvaturePairingHypotheses.hasDerivAt_weight
+    {h : FullSupportMomentWeight} {V : ℝ → ℝ} {k : ℕ}
+    (H : CurvaturePairingHypotheses h V k) {x : ℝ} (hx : 0 < x) :
+    HasDerivAt (fun y : ℝ => h y) (-(deriv V x) * h x) x := by
+  have hVwithin : DifferentiableWithinAt ℝ V (Ioi 0) x :=
+    H.smooth.differentiableOn (by norm_num) x hx
+  have hVat : DifferentiableAt ℝ V x :=
+    hVwithin.differentiableAt (isOpen_Ioi.mem_nhds hx)
+  have hexp :
+      HasDerivAt (fun y : ℝ => Real.exp (-V y))
+        (-(deriv V x) * Real.exp (-V x)) x := by
+    convert hVat.hasDerivAt.neg.exp using 1 <;> ring
+  have heq : (fun y : ℝ => h y) =ᶠ[𝓝 x] (fun y : ℝ => Real.exp (-V y)) := by
+    filter_upwards [isOpen_Ioi.eventually_mem hx] with y hy
+    exact H.weight_eq hy
+  have hh := hexp.congr_of_eventuallyEq heq
+  rw [← H.weight_eq hx] at hh
+  exact hh
 
 end CrossBoundaryMomentKernels
