@@ -62,8 +62,9 @@ theorem CurvaturePairingHypotheses.hasDerivAt_weight
   have hexp :
       HasDerivAt (fun y : ℝ => Real.exp (-V y))
         (-(deriv V x) * Real.exp (-V x)) x := by
-    convert hVat.hasDerivAt.neg.exp using 1 <;> ring
-  have heq : (fun y : ℝ => h y) =ᶠ[𝓝 x] (fun y : ℝ => Real.exp (-V y)) := by
+    simpa [Pi.neg_apply, neg_mul] using hVat.hasDerivAt.neg.exp
+  have heq :
+      (fun y : ℝ => h y) =ᶠ[nhds x] (fun y : ℝ => Real.exp (-V y)) := by
     filter_upwards [isOpen_Ioi.eventually_mem hx] with y hy
     exact H.weight_eq hy
   have hh := hexp.congr_of_eventuallyEq heq
