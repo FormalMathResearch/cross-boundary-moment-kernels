@@ -34,21 +34,21 @@ lemma momentC_eq_B_add_one (k : ℕ) : momentC k = momentB k + 1 := by
 Definition 2.1.  No curvature-specific analytic hypothesis is needed here. -/
 theorem momentA_factor_integrable (h : FullSupportMomentWeight) (k : ℕ) :
     Integrable (fun y : ℝ => y ^ (momentA k) * h y) (volume.restrict (Ioi 0)) := by
-  have hI := h.momentIntegrable k
-  change Integrable (momentIntegrand h k) (volume.restrict (Ioi (0 : ℝ))) at hI
-  simpa [momentIntegrand, momentA_eq_halfExponent] using hI
+  apply (h.momentIntegrable k).congr
+  filter_upwards with y
+  simp only [momentIntegrand, momentA_eq_halfExponent, Real.rpow_eq_pow]
 
 theorem momentB_factor_integrable (h : FullSupportMomentWeight) (k : ℕ) :
     Integrable (fun y : ℝ => y ^ (momentB k) * h y) (volume.restrict (Ioi 0)) := by
-  have hI := h.momentIntegrable (k + 1)
-  change Integrable (momentIntegrand h (k + 1)) (volume.restrict (Ioi (0 : ℝ))) at hI
-  simpa [momentIntegrand, momentB_eq_halfExponent_succ] using hI
+  apply (h.momentIntegrable (k + 1)).congr
+  filter_upwards with y
+  simp only [momentIntegrand, momentB_eq_halfExponent_succ, Real.rpow_eq_pow]
 
 theorem momentC_factor_integrable (h : FullSupportMomentWeight) (k : ℕ) :
     Integrable (fun y : ℝ => y ^ (momentC k) * h y) (volume.restrict (Ioi 0)) := by
-  have hI := h.momentIntegrable (k + 2)
-  change Integrable (momentIntegrand h (k + 2)) (volume.restrict (Ioi (0 : ℝ))) at hI
-  simpa [momentIntegrand, momentC_eq_halfExponent_add_two] using hI
+  apply (h.momentIntegrable (k + 2)).congr
+  filter_upwards with y
+  simp only [momentIntegrand, momentC_eq_halfExponent_add_two, Real.rpow_eq_pow]
 
 /-- The real nonnegative density inside the manuscript envelope `A_k` on the ordered region. -/
 def curvatureEnvelopeDensity
@@ -133,10 +133,12 @@ theorem abs_curvatureEnvelopeDensity_le_momentMajorant
     rw [momentB_eq_A_add_one, Real.rpow_add hy, Real.rpow_one]
   have hzB : z ^ (momentB k) = z ^ (momentA k) * z := by
     rw [momentB_eq_A_add_one, Real.rpow_add hz, Real.rpow_one]
-  have hyC : y ^ (momentC k) = y ^ (momentB k) * y := by
-    rw [momentC_eq_B_add_one, Real.rpow_add hy, Real.rpow_one]
-  have hzC : z ^ (momentC k) = z ^ (momentB k) * z := by
-    rw [momentC_eq_B_add_one, Real.rpow_add hz, Real.rpow_one]
+  have hyC : y ^ (momentC k) = y ^ (momentA k) * y ^ 2 := by
+    rw [momentC_eq_B_add_one, Real.rpow_add hy, Real.rpow_one, hyB]
+    ring
+  have hzC : z ^ (momentC k) = z ^ (momentA k) * z ^ 2 := by
+    rw [momentC_eq_B_add_one, Real.rpow_add hz, Real.rpow_one, hzB]
+    ring
   calc
     |curvatureEnvelopeDensity h k (y, z)| =
         (y * z) ^ (momentA k) * |z - y| * |tau h k - y * z| * h y * h z := by
@@ -159,7 +161,11 @@ lemma curvatureEnvelopeDensityMeasurableRep_measurable
     (h : FullSupportMomentWeight) (k : ℕ) :
     Measurable (curvatureEnvelopeDensityMeasurableRep h k) := by
   unfold curvatureEnvelopeDensityMeasurableRep
-  fun_prop
+  have hh1 : Measurable (fun p : ℝ × ℝ => h p.1) :=
+    h.measurable_toFun.comp measurable_fst
+  have hh2 : Measurable (fun p : ℝ × ℝ => h p.2) :=
+    h.measurable_toFun.comp measurable_snd
+  measurability
 
 /-- The actual envelope density is strongly measurable on the positive quadrant. -/
 theorem curvatureEnvelopeDensity_aestronglyMeasurableOn_positiveProduct
@@ -172,6 +178,8 @@ theorem curvatureEnvelopeDensity_aestronglyMeasurableOn_positiveProduct
   have heq : curvatureEnvelopeDensity h k =ᵐ[
       (volume.prod volume).restrict (Ioi (0 : ℝ) ×ˢ Ioi (0 : ℝ))]
       curvatureEnvelopeDensityMeasurableRep h k := by
+    change ∀ᵐ p ∂(volume.prod volume).restrict (Ioi (0 : ℝ) ×ˢ Ioi (0 : ℝ)),
+      curvatureEnvelopeDensity h k p = curvatureEnvelopeDensityMeasurableRep h k p
     rw [ae_restrict_iff' (measurableSet_Ioi.prod measurableSet_Ioi)]
     filter_upwards with p hp
     unfold curvatureEnvelopeDensity curvatureEnvelopeDensityMeasurableRep
