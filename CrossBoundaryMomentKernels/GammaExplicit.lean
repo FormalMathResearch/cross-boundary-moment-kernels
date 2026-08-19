@@ -165,7 +165,6 @@ theorem gammaCrossing_succ_sub {a : ℝ} {k : ℕ} (hk : 1 ≤ k) :
   have h2a : 1 + (2 : ℝ) * (k : ℝ) ≠ 0 := by linarith
   have h2b : 1 + (k : ℝ) * 2 ≠ 0 := by linarith
   field_simp [h1, h2, h2a, h2b] <;>
-    field_simp [h2b] <;>
     ring
 
 /-- Sharp adjacent-crossing threshold in the Gamma family. -/
