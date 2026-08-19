@@ -61,14 +61,14 @@ theorem CurvaturePairingHypotheses.hasDerivAt_weight
     hVwithin.differentiableAt (isOpen_Ioi.mem_nhds hx)
   have hexp :
       HasDerivAt (fun y : ℝ => Real.exp (-V y))
-        (-(deriv V x) * Real.exp (-V x)) x := by
-    simpa [Pi.neg_apply, neg_mul] using hVat.hasDerivAt.neg.exp
+        (-(Real.exp (-V x) * deriv V x)) x := by
+    simpa [Pi.neg_apply] using hVat.hasDerivAt.neg.exp
   have heq :
       (fun y : ℝ => h y) =ᶠ[nhds x] (fun y : ℝ => Real.exp (-V y)) := by
     filter_upwards [isOpen_Ioi.eventually_mem hx] with y hy
     exact H.weight_eq hy
   have hh := hexp.congr_of_eventuallyEq heq
-  rw [← H.weight_eq hx] at hh
-  exact hh
+  have hxEq : Real.exp (-V x) = h x := (H.weight_eq hx).symm
+  convert hh using 1 <;> simp [hxEq] <;> ring
 
 end CrossBoundaryMomentKernels
