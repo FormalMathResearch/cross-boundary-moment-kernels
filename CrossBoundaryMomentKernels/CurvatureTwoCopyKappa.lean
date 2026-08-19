@@ -199,7 +199,7 @@ theorem CurvaturePairingHypotheses.integral_curvatureCombinedTwoCopyKernel
     (∫ p, tau h k * curvatureCovarianceTwoCopyKernel h V k p -
       curvatureCovarianceTwoCopyKernel h V (k + 1) p
         ∂((volume.restrict (Ioi (0 : ℝ))).prod (volume.restrict (Ioi (0 : ℝ))))) = _
-  rw [integral_sub H.curvatureCovarianceTwoCopyKernel_integrable.const_mul
+  rw [integral_sub (H.curvatureCovarianceTwoCopyKernel_integrable.const_mul (tau h k))
     H.curvatureCovarianceTwoCopyKernel_integrable_succ]
   rw [integral_const_mul]
 
@@ -218,11 +218,7 @@ theorem CurvaturePairingHypotheses.momentCurvature_eq_combinedTwoCopy
     H.integral_curvatureCombinedTwoCopyKernel]
   rw [momentRatioScale, momentRatioScale, tau_eq_curvature_moment_ratio h H.index]
   have hk1 : k + 1 - 1 = k := by omega
-  rw [hk1]
-  have hA1 : momentA (1 + k) = momentB k := by
-    rw [Nat.add_comm]
-    exact (momentB_eq_A_succ k).symm
-  rw [hA1]
+  rw [hk1, ← momentB_eq_A_succ k]
   field_simp [ne_of_gt (h.momentPositive (k - 1)), ne_of_gt (h.momentPositive k),
     ne_of_gt (h.momentPositive (k + 1)), ne_of_gt (momentA_pos H.index),
     ne_of_gt (show 0 < momentB k by rw [momentB]; positivity),
