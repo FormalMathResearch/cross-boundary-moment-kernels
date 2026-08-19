@@ -70,15 +70,27 @@ theorem gamma_uStar_reverse_order_iff
       linarith
     · exact hrev
 
-/-- **Manuscript Theorem 2.7 (Gamma model and sharpness), publication-facing form.**
-This theorem merely packages the independently proved identities; it does not strengthen the
-manuscript hypotheses. -/
-theorem gamma_theorem_2_7
-    {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (hk : 1 ≤ k)
-    {u : ℝ} (hu : 0 < u) :
+/-- **Manuscript Theorem 2.7, all-index opening identities.**
+The manuscript states `I_k = Γ(α_k)` and the explicit determinant formula before imposing
+`k ≥ 1` for the crossing assertions.  This wrapper therefore deliberately has no `k ≥ 1`
+hypothesis. -/
+theorem gamma_theorem_2_7_all_index
+    {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (k : ℕ) {u : ℝ} (hu : 0 < u) :
     I (gammaFullSupportWeight a ha) k = Real.Gamma (gammaAlpha a k) ∧
     K (gammaFullSupportWeight a ha) k u =
-      I (gammaFullSupportWeight a ha) k * u ^ (gammaAlpha a k) * Real.exp (-u) ∧
+      I (gammaFullSupportWeight a ha) k * u ^ (gammaAlpha a k) * Real.exp (-u) := by
+  constructor
+  · change I (gammaModelWeight a) k = Real.Gamma (gammaAlpha a k)
+    exact gamma_I_eq_Gamma ha k
+  · exact gamma_K_eq ha k hu.le
+
+/-- **Manuscript Theorem 2.7, crossing block.**
+These are exactly the assertions in the theorem for the manuscript range `k ≥ 1`.  The
+all-index moment and determinant identities are kept separately in
+`gamma_theorem_2_7_all_index` so that their hypotheses are not strengthened for convenience. -/
+theorem gamma_theorem_2_7_crossing
+    {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (hk : 1 ≤ k)
+    {u : ℝ} (hu : 0 < u) :
     uStar (gammaFullSupportWeight a ha) k = gammaCrossing a k ∧
     R (gammaFullSupportWeight a ha) k u =
       2 * I (gammaFullSupportWeight a ha) (k + 1) * u ^ (gammaAlpha a k) *
@@ -102,9 +114,6 @@ theorem gamma_theorem_2_7
     (uStar (gammaFullSupportWeight a ha) (k + 1) <
         uStar (gammaFullSupportWeight a ha) k ↔
       (4 * (k : ℝ) ^ 2 - 1) / 8 < a) := by
-  have hI : I (gammaFullSupportWeight a ha) k = Real.Gamma (gammaAlpha a k) := by
-    change I (gammaModelWeight a) k = Real.Gamma (gammaAlpha a k)
-    exact gamma_I_eq_Gamma ha k
   have hdiff :
       uStar (gammaFullSupportWeight a ha) (k + 1) -
           uStar (gammaFullSupportWeight a ha) k =
@@ -112,13 +121,14 @@ theorem gamma_theorem_2_7
           (((2 : ℝ) * (k : ℝ) - 1) * ((2 : ℝ) * (k : ℝ) + 1)) := by
     rw [gamma_uStar_eq ha (by omega), gamma_uStar_eq ha hk]
     exact gammaCrossing_succ_sub hk
-  exact ⟨hI, gamma_K_eq ha k hu.le, gamma_uStar_eq ha hk,
-    gamma_R_eq ha hk hu, gamma_Rhat_eq ha hk hu, gamma_Z_succ_div_Z ha hk hu,
-    hdiff, gamma_uStar_order_iff ha hk, gamma_uStar_eq_iff_threshold ha hk,
-    gamma_uStar_reverse_order_iff ha hk⟩
+  exact ⟨gamma_uStar_eq ha hk, gamma_R_eq ha hk hu, gamma_Rhat_eq ha hk hu,
+    gamma_Z_succ_div_Z ha hk hu, hdiff, gamma_uStar_order_iff ha hk,
+    gamma_uStar_eq_iff_threshold ha hk, gamma_uStar_reverse_order_iff ha hk⟩
 
-/-- **Manuscript Corollary 2.8, publication-facing form.** Positive Gamma shape exponent gives
-strict log-concavity of `log h_a` on `(0,∞)`, while `a=1` supplies the stated reversed crossing. -/
+/-- **Manuscript Corollary 2.8, publication-facing form.**
+For `a > 0` the logarithmic profile `log h_a(y) = a log y - y` is strictly concave on
+`(0,∞)`, i.e. the Gamma weight is strictly log-concave there.  The `a = 1` instance gives
+the manuscript's explicit reversed crossing. -/
 theorem gamma_corollary_2_8 {a : ℝ} (ha : 0 < a) :
     StrictConcaveOn ℝ (Ioi (0 : ℝ)) (gammaLogProfile a) ∧
     uStar (gammaFullSupportWeight 1 (by norm_num)) 1 = 15 / 2 ∧
@@ -127,7 +137,10 @@ theorem gamma_corollary_2_8 {a : ℝ} (ha : 0 < a) :
       uStar (gammaFullSupportWeight 1 (by norm_num)) 1 := by
   exact ⟨gammaLogProfile_strictConcaveOn_Ioi ha, gamma_a_one_reversed_crossing⟩
 
-/-- **Manuscript Corollary 2.9, publication-facing form.** -/
+/-- **Manuscript Corollary 2.9, publication-facing form.**
+The first three conjuncts are the exact `s_k`/`κ_k` formula and positivity assertion for
+`k ≥ 1`.  The final conjunct records the same reversed-crossing witness `a = 1`, making the
+manuscript conclusion that positive moment-ratio curvature is insufficient explicit. -/
 theorem gamma_corollary_2_9
     {a : ℝ} (ha : 0 < a) {k : ℕ} (hk : 1 ≤ k) :
     momentRatioScale (gammaFullSupportWeight a (by linarith)) k =
@@ -136,14 +149,17 @@ theorem gamma_corollary_2_9
         16 * a /
           (((2 : ℝ) * (k : ℝ) - 1) * ((2 : ℝ) * (k : ℝ) + 1) *
             ((2 : ℝ) * (k : ℝ) + 3)) ∧
-    0 < momentCurvature (gammaFullSupportWeight a (by linarith)) k := by
+    0 < momentCurvature (gammaFullSupportWeight a (by linarith)) k ∧
+    uStar (gammaFullSupportWeight 1 (by norm_num)) 2 <
+      uStar (gammaFullSupportWeight 1 (by norm_num)) 1 := by
   exact ⟨gamma_momentRatioScale_eq (by linarith) hk,
     gamma_momentCurvature_eq (by linarith) hk,
-    gamma_momentCurvature_pos ha hk⟩
+    gamma_momentCurvature_pos ha hk,
+    gamma_a_one_reversed_crossing.2.2⟩
 
 /-- **Manuscript Proposition 2.10 (Exact Gamma product law), publication-facing form.**
-The first conjunct is equality of pushforward probability measures; the remaining two are the
-mean and variance consequences printed in the manuscript. -/
+For the proposition's stated range `k ≥ 0`, the first conjunct is equality of pushforward
+probability measures and the remaining two are the printed mean and variance consequences. -/
 theorem gamma_proposition_2_10
     {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (k : ℕ) {u : ℝ} (hu : 0 < u) :
     (crossBoundaryMeasure (gammaFullSupportWeight a ha) k u).map
@@ -155,7 +171,9 @@ theorem gamma_proposition_2_10
     gamma_crossBoundaryMean_eq ha k hu,
     gamma_crossBoundaryVariance_eq ha k hu⟩
 
-/-- The final variance identity stated after manuscript Proposition 2.10. -/
+/-- The last sentence of manuscript Proposition 2.10 specializes the variance to `u = u_k*`.
+Since the manuscript defines the canonical crossing only for `k ≥ 1`, that index condition is
+made explicit here rather than silently extending the crossing notation to `k = 0`. -/
 theorem gamma_proposition_2_10_variance_at_crossing
     {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (hk : 1 ≤ k) :
     crossBoundaryVariance (gammaFullSupportWeight a ha) k
