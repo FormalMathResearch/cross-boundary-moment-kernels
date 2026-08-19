@@ -195,6 +195,9 @@ theorem CurvaturePairingHypotheses.integral_curvatureCovarianceTwoCopyKernel
     funext p
     rfl
   rw [hEfun]
+  change
+    (∫ p, (q1 p.1 * f0 p.2 - f1 p.1 * q0 p.2 - q0 p.1 * f1 p.2) +
+        f0 p.1 * q1 p.2 ∂(μ.prod μ)) = _
   rw [integral_add ((h1.sub h2).sub h3) h4, integral_sub (h1.sub h2) h3,
     integral_sub h1 h2]
   simp only [integral_prod_mul]
