@@ -44,7 +44,6 @@ theorem gamma_normalizedProduct_moment {a : ℝ} (ha : -(1 / 2 : ℝ) < a)
         ∂crossBoundaryMeasure (gammaFullSupportWeight a ha) k u =
       Real.Gamma (gammaAlpha a (k + m)) / Real.Gamma (gammaAlpha a k) := by
   have hu0 : u ≠ 0 := ne_of_gt hu
-  have hpow : u ^ m ≠ 0 := pow_ne_zero m hu0
   calc
     ∫ p, (gammaNormalizedProduct u p) ^ m
         ∂crossBoundaryMeasure (gammaFullSupportWeight a ha) k u =
@@ -62,8 +61,15 @@ theorem gamma_normalizedProduct_moment {a : ℝ} (ha : -(1 / 2 : ℝ) < a)
     _ = I (gammaFullSupportWeight a ha) (k + m) /
         I (gammaFullSupportWeight a ha) k := by
       rw [gamma_K_add_ratio ha k m hu]
-      rw [← inv_pow]
-      field_simp [hpow]
+      calc
+        u⁻¹ ^ m *
+            ((I (gammaFullSupportWeight a ha) (k + m) /
+                I (gammaFullSupportWeight a ha) k) * u ^ m) =
+            (I (gammaFullSupportWeight a ha) (k + m) /
+                I (gammaFullSupportWeight a ha) k) * (u⁻¹ ^ m * u ^ m) := by ring
+        _ = I (gammaFullSupportWeight a ha) (k + m) /
+            I (gammaFullSupportWeight a ha) k := by
+          rw [← mul_pow, inv_mul_cancel₀ hu0, one_pow, mul_one]
     _ = Real.Gamma (gammaAlpha a (k + m)) / Real.Gamma (gammaAlpha a k) := by
       change I (gammaModelWeight a) (k + m) / I (gammaModelWeight a) k = _
       rw [gamma_I_eq_Gamma ha (k + m), gamma_I_eq_Gamma ha k]
@@ -89,21 +95,24 @@ theorem gammaMeasure_moment {α : ℝ} (hα : 0 < α) (m : ℕ) :
       apply integral_congr_ae
       filter_upwards with x
       by_cases hx : 0 ≤ x
-      · simp [Set.indicator_of_mem hx]
-      · simp [Set.indicator_of_not_mem hx, ProbabilityTheory.gammaPDFReal, hx]
+      · simp [Set.mem_Ici, hx]
+      · simp [Set.mem_Ici, hx, ProbabilityTheory.gammaPDFReal]
     _ = ∫ x : ℝ in Ioi 0,
         (1 / Real.Gamma α) * x ^ (α + m - 1) * Real.exp (-x) := by
       rw [integral_Ici_eq_integral_Ioi]
       apply setIntegral_congr_fun measurableSet_Ioi
       intro x hx
-      rw [ProbabilityTheory.gammaPDFReal, if_pos hx.le]
-      simp only [one_rpow, one_mul, one_mul]
+      simp only [ProbabilityTheory.gammaPDFReal, if_pos hx.le, one_rpow, one_mul]
       rw [show α + (m : ℝ) - 1 = (α - 1) + (m : ℝ) by ring,
         Real.rpow_add hx, Real.rpow_natCast]
       ring
-    _ = Real.Gamma (α + m) / Real.Gamma α := by
+    _ = (1 / Real.Gamma α) *
+        ∫ x : ℝ in Ioi 0, Real.exp (-x) * x ^ ((α + m) - 1) := by
       rw [← integral_const_mul]
-      rw [show α + (m : ℝ) - 1 = (α + m) - 1 by ring]
+      apply setIntegral_congr_fun measurableSet_Ioi
+      intro x _
+      ring
+    _ = Real.Gamma (α + m) / Real.Gamma α := by
       rw [(Real.Gamma_eq_integral (by positivity : 0 < α + m)).symm]
       ring
 
