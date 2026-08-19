@@ -49,6 +49,8 @@ theorem CurvaturePairingHypotheses.absoluteEnvelope_lintegral_eq_ofReal_integral
   have hnn :
       0 ≤ᵐ[volume.restrict (Ioi (0 : ℝ))]
         (fun u : ℝ => |deriv (deriv V) u| * curvatureEnvelope h k u) := by
+    change ∀ᵐ u ∂volume.restrict (Ioi (0 : ℝ)),
+      0 ≤ |deriv (deriv V) u| * curvatureEnvelope h k u
     rw [ae_restrict_iff' measurableSet_Ioi]
     filter_upwards with u hu
     exact mul_nonneg (abs_nonneg _) (curvatureEnvelope_nonneg h k hu)
@@ -58,11 +60,11 @@ theorem CurvaturePairingHypotheses.absoluteEnvelope_lintegral_eq_ofReal_integral
   apply lintegral_congr
   intro u
   by_cases hu : 0 < u
-  · rw [if_pos hu]
-    simp only [Set.indicator_of_mem hu]
-    rw [mul_comm, ← ENNReal.ofReal_mul (abs_nonneg (deriv (deriv V) u))]
-  · rw [if_neg hu]
-    simp [Set.indicator_of_notMem hu]
+  · have humem : u ∈ Ioi (0 : ℝ) := hu
+    rw [if_pos hu, Set.indicator_of_mem humem]
+    ac_rfl
+  · have hunmem : u ∉ Ioi (0 : ℝ) := hu
+    rw [if_neg hu, Set.indicator_of_notMem hunmem]
 
 /-- **Finite absolute Tonelli identity.**
 The manuscript envelope assumption makes the nonnegative three-variable Tonelli integral finite.
