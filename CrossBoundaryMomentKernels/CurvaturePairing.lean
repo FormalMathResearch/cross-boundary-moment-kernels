@@ -68,8 +68,11 @@ theorem CurvaturePairingHypotheses.hasDerivAt_weight
     filter_upwards [isOpen_Ioi.eventually_mem hx] with y hy
     exact H.weight_eq hy
   have hh := hexp.congr_of_eventuallyEq heq
+  have hxEq : h x = Real.exp (-V x) := by
+    exact H.weight_eq hx
   apply hh.congr_deriv
-  rw [(H.weight_eq hx).symm]
-  ring
+  calc
+    -(Real.exp (-V x) * deriv V x) = -(deriv V x) * Real.exp (-V x) := by ring
+    _ = -(deriv V x) * h x := by rw [hxEq]
 
 end CrossBoundaryMomentKernels
