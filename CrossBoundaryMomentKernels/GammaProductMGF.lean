@@ -7,6 +7,11 @@ open scoped ENNReal ProbabilityTheory Topology
 
 namespace CrossBoundaryMomentKernels
 
+/-- The normalized product is a measurable real-valued observable. -/
+lemma gammaNormalizedProduct_measurable (u : ℝ) : Measurable (gammaNormalizedProduct u) := by
+  unfold gammaNormalizedProduct crossBoundaryProduct
+  fun_prop
+
 /-- The real Gamma density is integrable for every positive shape and positive rate. -/
 lemma gammaPDFReal_integrable {α r : ℝ} (hα : 0 < α) (hr : 0 < r) :
     Integrable (ProbabilityTheory.gammaPDFReal α r) := by
@@ -36,12 +41,16 @@ theorem gammaMeasure_exp_integrable_of_lt_one {α t : ℝ} (hα : 0 < α) (ht : 
     · rw [ProbabilityTheory.gammaPDFReal, if_pos hx,
         ProbabilityTheory.gammaPDFReal, if_pos hx]
       simp
-      rw [← Real.exp_add]
-      have hexp : -(r * x) = -x + t * x := by
-        dsimp [r]
-        ring
-      rw [← hexp]
-      field_simp [hrpow, hGamma]
+      calc
+        (r ^ α)⁻¹ * (r ^ α / Real.Gamma α * x ^ (α - 1) * Real.exp (-(r * x))) =
+            (Real.Gamma α)⁻¹ * x ^ (α - 1) * Real.exp (-(r * x)) := by
+          field_simp [hrpow, hGamma]
+        _ = (Real.Gamma α)⁻¹ * x ^ (α - 1) * Real.exp (-x) * Real.exp (t * x) := by
+          rw [← Real.exp_add]
+          have hexp : -(r * x) = -x + t * x := by
+            dsimp [r]
+            ring
+          rw [hexp]
     · rw [ProbabilityTheory.gammaPDFReal, if_neg hx,
         ProbabilityTheory.gammaPDFReal, if_neg hx]
       simp
@@ -70,8 +79,8 @@ lemma gammaNormalizedProduct_nonneg_ae
   have hac :
       crossBoundaryMeasure (gammaFullSupportWeight a ha) k u ≪ crossBoundaryBaseMeasure u := by
     rw [crossBoundaryMeasure]
-    exact withDensity_absolutelyContinuous
-  exact (ae_le_iff_absolutelyContinuous.mpr hac) hbase
+    exact withDensity_absolutelyContinuous (crossBoundaryBaseMeasure u) _
+  exact hac.ae_le hbase
 
 /-- The negative half exponential moment of `X/u` is integrable; this supplies the left side of
 an open MGF neighborhood around zero. -/
@@ -85,9 +94,15 @@ theorem gammaNormalizedProduct_exp_neg_half_integrable
   have hconst : Integrable (fun _ : ℝ × ℝ => (1 : ℝ))
       (crossBoundaryMeasure (gammaFullSupportWeight a ha) k u) := by
     fun_prop
-  refine hconst.mono (by fun_prop) ?_
+  have hmeas : AEStronglyMeasurable
+      (fun p => Real.exp (-(1 / 2 : ℝ) * gammaNormalizedProduct u p))
+      (crossBoundaryMeasure (gammaFullSupportWeight a ha) k u) := by
+    exact (measurable_exp.comp
+      (measurable_const.mul (gammaNormalizedProduct_measurable u))).aestronglyMeasurable
+  refine hconst.mono hmeas ?_
   filter_upwards [gammaNormalizedProduct_nonneg_ae ha k hu] with p hp
-  simp only [norm_eq_abs, abs_exp, norm_one]
-  exact Real.exp_le_one_iff.mpr (mul_nonpos_of_nonpos_of_nonneg (by norm_num) hp)
+  rw [Real.norm_eq_abs, abs_of_pos (Real.exp_pos _), norm_one]
+  have hcoef : (-(1 / 2 : ℝ)) ≤ 0 := by norm_num
+  exact Real.exp_le_one_iff.mpr (mul_nonpos_of_nonpos_of_nonneg hcoef hp)
 
 end CrossBoundaryMomentKernels
