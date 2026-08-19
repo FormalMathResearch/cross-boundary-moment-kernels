@@ -82,4 +82,59 @@ theorem gammaMomentIntegrable {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (k : ℕ) :
   filter_upwards with y hy
   exact (gammaMomentIntegrand_eq a k hy).symm
 
+/-- The Gamma weight itself is integrable on the positive half-line. -/
+theorem gammaModelWeight_integrableOn_Ioi {a : ℝ} (ha : -(1 / 2 : ℝ) < a) :
+    IntegrableOn (gammaModelWeight a) (Ioi (0 : ℝ)) := by
+  have hs : 0 < a + 1 := by linarith
+  have hbase := Real.GammaIntegral_convergent hs
+  change Integrable (gammaModelWeight a) (volume.restrict (Ioi (0 : ℝ)))
+  have hbase' :
+      Integrable (fun y : ℝ => Real.exp (-y) * y ^ ((a + 1) - 1))
+        (volume.restrict (Ioi (0 : ℝ))) := by
+    simpa [IntegrableOn] using hbase
+  apply hbase'.congr
+  refine (ae_restrict_iff' measurableSet_Ioi).2 ?_
+  filter_upwards with y hy
+  rw [gammaModelWeight]
+  have hexp : (a + 1) - 1 = a := by ring
+  rw [hexp]
+  ring
+
+/-- For every `a > -1/2`, the manuscript Gamma family is an admissible full-support moment weight. -/
+def gammaFullSupportWeight (a : ℝ) (ha : -(1 / 2 : ℝ) < a) : FullSupportMomentWeight where
+  toFun := gammaModelWeight a
+  measurable_toFun := gammaModelWeight_measurable a
+  nonneg := by
+    intro y hy
+    exact gammaModelWeight_nonneg a hy
+  fullSupport := by
+    intro A B hA hAB
+    have hint : IntegrableOn (gammaModelWeight a) (Ioc A B) :=
+      (gammaModelWeight_integrableOn_Ioi ha).mono_set (by
+        intro y hy
+        exact lt_trans hA hy.1)
+    have hnonneg : 0 ≤ᵐ[volume.restrict (Ioc A B)] gammaModelWeight a := by
+      refine (ae_restrict_iff' measurableSet_Ioc).2 ?_
+      filter_upwards with y hy
+      exact gammaModelWeight_nonneg a (lt_trans hA hy.1)
+    have hsupp : Function.support (gammaModelWeight a) ∩ Ioc A B = Ioc A B := by
+      apply Set.Subset.antisymm
+      · exact inter_subset_right
+      · intro y hy
+        exact ⟨ne_of_gt (gammaModelWeight_pos a (lt_trans hA hy.1)), hy⟩
+    rw [setIntegral_pos_iff_support_of_nonneg_ae hnonneg hint, hsupp]
+    rw [volume_Ioc]
+    exact ENNReal.ofReal_pos.mpr (sub_pos.mpr hAB)
+  momentIntegrable := by
+    intro k
+    exact gammaMomentIntegrable ha k
+  momentPositive := by
+    intro k
+    rw [gamma_I_eq_Gamma ha k]
+    exact Real.Gamma_pos_of_pos (gammaAlpha_pos ha k)
+
+@[simp]
+lemma gammaFullSupportWeight_apply (a : ℝ) (ha : -(1 / 2 : ℝ) < a) (y : ℝ) :
+    gammaFullSupportWeight a ha y = gammaModelWeight a y := rfl
+
 end CrossBoundaryMomentKernels
