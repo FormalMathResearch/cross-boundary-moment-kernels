@@ -26,7 +26,8 @@ lemma momentC_sub_one_eq_halfExponent_succ (k : ℕ) :
   push_cast
   ring
 
-/-- The first specialization printed immediately after manuscript Lemma 5.1. -/
+/-- The first specialization printed immediately after manuscript Lemma 5.1:
+`∫ y^{a_k} V'(y) h(y) dy = a_k I_{k-1}`. -/
 theorem CurvaturePairingHypotheses.ibp_at_A
     {h : FullSupportMomentWeight} {V : ℝ → ℝ} {k : ℕ}
     (H : CurvaturePairingHypotheses h V k) :
@@ -44,7 +45,8 @@ theorem CurvaturePairingHypotheses.ibp_at_A
   rw [momentA_sub_one_eq_halfExponent_pred H.index] at hibp
   simpa [I, momentIntegrand, Real.rpow_eq_pow] using hibp
 
-/-- The second specialization printed immediately after manuscript Lemma 5.1. -/
+/-- The second specialization printed immediately after manuscript Lemma 5.1:
+`∫ y^{b_k} V'(y) h(y) dy = b_k I_k`. -/
 theorem CurvaturePairingHypotheses.ibp_at_B
     {h : FullSupportMomentWeight} {V : ℝ → ℝ} {k : ℕ}
     (H : CurvaturePairingHypotheses h V k) :
@@ -64,7 +66,8 @@ theorem CurvaturePairingHypotheses.ibp_at_B
   rw [momentB_sub_one_eq_halfExponent] at hibp
   simpa [I, momentIntegrand, Real.rpow_eq_pow] using hibp
 
-/-- The third specialization printed immediately after manuscript Lemma 5.1. -/
+/-- The third specialization printed immediately after manuscript Lemma 5.1:
+`∫ y^{c_k} V'(y) h(y) dy = c_k I_{k+1}`. -/
 theorem CurvaturePairingHypotheses.ibp_at_C
     {h : FullSupportMomentWeight} {V : ℝ → ℝ} {k : ℕ}
     (H : CurvaturePairingHypotheses h V k) :
