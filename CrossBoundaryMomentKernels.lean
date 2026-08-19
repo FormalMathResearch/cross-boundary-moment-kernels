@@ -32,3 +32,4 @@ import CrossBoundaryMomentKernels.GammaProductLaw
 import CrossBoundaryMomentKernels.GammaProductMGF
 import CrossBoundaryMomentKernels.GammaProductDistribution
 import CrossBoundaryMomentKernels.GammaManuscriptForm
+import CrossBoundaryMomentKernels.CurvaturePairing
