@@ -25,3 +25,4 @@ import CrossBoundaryMomentKernels.InterOrderEquivalence
 import CrossBoundaryMomentKernels.InterOrderTrichotomy
 import CrossBoundaryMomentKernels.GammaModel
 import CrossBoundaryMomentKernels.GammaRecurrence
+import CrossBoundaryMomentKernels.GammaExplicit
