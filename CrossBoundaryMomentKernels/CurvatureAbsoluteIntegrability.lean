@@ -61,8 +61,8 @@ theorem CurvaturePairingHypotheses.absoluteEnvelope_lintegral_eq_ofReal_integral
   intro u
   by_cases hu : 0 < u
   · have humem : u ∈ Ioi (0 : ℝ) := hu
-    rw [if_pos hu, Set.indicator_of_mem humem]
-    ac_rfl
+    rw [if_pos hu, Set.indicator_of_mem humem,
+      ENNReal.ofReal_mul (curvatureEnvelope_nonneg h k hu)]
   · have hunmem : u ∉ Ioi (0 : ℝ) := hu
     rw [if_neg hu, Set.indicator_of_notMem hunmem]
 
