@@ -53,14 +53,15 @@ lemma gamma_tau_eq_moment_ratio {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (h
       (((2 : ℝ) * (k : ℝ) + 3) / ((2 : ℝ) * (k : ℝ) - 1)) *
         (I (gammaFullSupportWeight a ha) (k + 1) /
           I (gammaFullSupportWeight a ha) (k - 1)) := by
-  let h := gammaFullSupportWeight a ha
   have hkR : (1 : ℝ) ≤ (k : ℝ) := by exact_mod_cast hk
-  have hIkm1 : I h (k - 1) ≠ 0 := ne_of_gt (h.momentPositive (k - 1))
-  have hIk : I h k ≠ 0 := ne_of_gt (h.momentPositive k)
-  have hIk1 : I h (k + 1) ≠ 0 := ne_of_gt (h.momentPositive (k + 1))
+  have hIkm1 : I (gammaFullSupportWeight a ha) (k - 1) ≠ 0 :=
+    ne_of_gt ((gammaFullSupportWeight a ha).momentPositive (k - 1))
+  have hIk : I (gammaFullSupportWeight a ha) k ≠ 0 :=
+    ne_of_gt ((gammaFullSupportWeight a ha).momentPositive k)
+  have hIk1 : I (gammaFullSupportWeight a ha) (k + 1) ≠ 0 :=
+    ne_of_gt ((gammaFullSupportWeight a ha).momentPositive (k + 1))
   have hf1 : (2 : ℝ) * (k : ℝ) - 1 ≠ 0 := by linarith
   have hf2 : (2 : ℝ) * (k : ℝ) + 1 ≠ 0 := by linarith
-  change tau h k = _
   rw [tau, gamma_N_succ_eq ha k, N]
   field_simp [hIkm1, hIk, hIk1, hf1, hf2]
   ring
@@ -69,17 +70,16 @@ lemma gamma_tau_eq_moment_ratio {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (h
 theorem gamma_tau_eq {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (hk : 1 ≤ k) :
     tau (gammaFullSupportWeight a ha) k =
       gammaAlpha a k * gammaCrossing a k := by
-  let h := gammaFullSupportWeight a ha
-  have hIkm1 : I h (k - 1) ≠ 0 := ne_of_gt (h.momentPositive (k - 1))
+  have hIkm1 : I (gammaFullSupportWeight a ha) (k - 1) ≠ 0 :=
+    ne_of_gt ((gammaFullSupportWeight a ha).momentPositive (k - 1))
   have hrec1 := gamma_I_succ ha k
   have hrec0 := gamma_I_succ ha (k - 1)
   have hidx : k - 1 + 1 = k := Nat.sub_add_cancel hk
   rw [hidx, gammaAlpha_pred hk] at hrec0
   have hratio :
-      I h (k + 1) / I h (k - 1) =
+      I (gammaFullSupportWeight a ha) (k + 1) /
+          I (gammaFullSupportWeight a ha) (k - 1) =
         gammaAlpha a k * (gammaAlpha a k - 1) := by
-    change I (gammaFullSupportWeight a ha) (k + 1) /
-        I (gammaFullSupportWeight a ha) (k - 1) = _
     rw [hrec1, hrec0]
     field_simp [hIkm1]
     ring
@@ -127,11 +127,11 @@ theorem gamma_Rhat_eq {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (hk : 1 ≤ 
         (((2 : ℝ) * (k : ℝ) + 1) * ((2 : ℝ) * (k : ℝ) + 3) *
           I (gammaFullSupportWeight a ha) k) *
         (gammaCrossing a k - u) := by
-  let h := gammaFullSupportWeight a ha
-  have hIk : I h k ≠ 0 := ne_of_gt (h.momentPositive k)
-  have hIk1 : I h (k + 1) ≠ 0 := ne_of_gt (h.momentPositive (k + 1))
-  change R h k u / N h (k + 1) = _
-  rw [gamma_R_eq ha hk hu, gamma_N_succ_eq ha k]
+  have hIk : I (gammaFullSupportWeight a ha) k ≠ 0 :=
+    ne_of_gt ((gammaFullSupportWeight a ha).momentPositive k)
+  have hIk1 : I (gammaFullSupportWeight a ha) (k + 1) ≠ 0 :=
+    ne_of_gt ((gammaFullSupportWeight a ha).momentPositive (k + 1))
+  rw [Rhat, gamma_R_eq ha hk hu, gamma_N_succ_eq ha k]
   field_simp [hIk, hIk1]
   ring
 
@@ -141,12 +141,15 @@ theorem gamma_Z_succ_div_Z {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (hk : 1
     Z (gammaFullSupportWeight a ha) (k + 1) u /
         Z (gammaFullSupportWeight a ha) k u =
       u / gammaCrossing a k := by
-  let h := gammaFullSupportWeight a ha
-  have hK : K h k u ≠ 0 := ne_of_gt (K_pos h k hu)
-  have hN : N h k ≠ 0 := ne_of_gt (N_pos h hk)
+  have hK : K (gammaFullSupportWeight a ha) k u ≠ 0 :=
+    ne_of_gt (K_pos (gammaFullSupportWeight a ha) k hu)
+  have hN : N (gammaFullSupportWeight a ha) k ≠ 0 :=
+    ne_of_gt (N_pos (gammaFullSupportWeight a ha) hk)
   have hα : gammaAlpha a k ≠ 0 := ne_of_gt (gammaAlpha_pos ha k)
   have hcross : gammaCrossing a k ≠ 0 := ne_of_gt (gammaCrossing_pos ha hk)
-  have hNshift : N h (k + 1) = tau h k * N h k := by
+  have hNshift :
+      N (gammaFullSupportWeight a ha) (k + 1) =
+        tau (gammaFullSupportWeight a ha) k * N (gammaFullSupportWeight a ha) k := by
     rw [tau]
     field_simp [hN]
   rw [Z, Z, gamma_K_succ_eq ha k hu, hNshift, gamma_tau_eq ha hk]
@@ -163,8 +166,9 @@ theorem gammaCrossing_succ_sub {a : ℝ} {k : ℕ} (hk : 1 ≤ k) :
   push_cast
   have h1 : (2 : ℝ) * (k : ℝ) - 1 ≠ 0 := by linarith
   have h2 : (2 : ℝ) * (k : ℝ) + 1 ≠ 0 := by linarith
-  have h2' : 1 + (2 : ℝ) * (k : ℝ) ≠ 0 := by linarith
-  field_simp [h1, h2, h2']
+  have h2a : 1 + (2 : ℝ) * (k : ℝ) ≠ 0 := by linarith
+  have h2b : 1 + (k : ℝ) * 2 ≠ 0 := by linarith
+  field_simp [h1, h2, h2a, h2b]
   ring
 
 /-- Sharp adjacent-crossing threshold in the Gamma family. -/
