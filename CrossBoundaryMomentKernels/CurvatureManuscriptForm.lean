@@ -121,8 +121,14 @@ theorem curvature_corollary_2_6
   -- Theorem 2.5 and the unique-crossing sign pattern are the two inputs.
   have hPairing := H.momentCurvature_eq_curvaturePairing
   have huStar := uStar_spec h hk
-  have hLeftSign := R_pos_before_uStar h hk
-  have hRightSign := R_neg_after_uStar h hk
+  have hLeftSign :
+      ∀ {x : ℝ}, 0 < x → x < uStar h k → 0 < R h k x := by
+    intro x hx hxu
+    exact R_pos_before_uStar h hk hx hxu
+  have hRightSign :
+      ∀ {x : ℝ}, uStar h k < x → R h k x < 0 := by
+    intro x hux
+    exact R_neg_after_uStar h hk hux
 
   -- Absolute convergence from Theorem 2.5 permits the split at u_k^*.
   have hSplit := H.curvaturePairingIntegral_eq_left_sub_rightAbs hconvex
