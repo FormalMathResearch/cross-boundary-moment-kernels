@@ -101,7 +101,8 @@ theorem gammaNormalizedProduct_complexMGF_eqOn_strip
   refine ⟨fun n ↦ (xs n : ℂ), ?_, fun n ↦ ?_⟩
   · rw [tendsto_nhdsWithin_iff] at hx_tendsto ⊢
     constructor
-    · rw [tendsto_ofReal_iff]
+    · change Tendsto (fun n => (xs n : ℂ)) atTop (𝓝 ((0 : ℝ) : ℂ))
+      rw [tendsto_ofReal_iff]
       exact hx_tendsto.1
     · simpa using hx_tendsto.2
   · simpa using hx_eq n
