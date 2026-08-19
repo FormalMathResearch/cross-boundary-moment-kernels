@@ -151,7 +151,7 @@ theorem gamma_crossBoundaryVariance_eq
     gamma_crossBoundaryMean_eq ha (k + 1) hu,
     gammaAlpha_succ] at hdrift
   have hden : gammaAlpha a k * u ≠ 0 := mul_ne_zero hα hu0
-  rw [div_eq_iff hden] at hdrift
+  rw [eq_div_iff hden] at hdrift
   calc
     crossBoundaryVariance (gammaFullSupportWeight a ha) k u =
         ((gammaAlpha a k + 1) * u - gammaAlpha a k * u) *
@@ -169,6 +169,5 @@ theorem gamma_crossBoundaryVariance_at_uStar
     gamma_tau_eq ha hk]
   have hα : gammaAlpha a k ≠ 0 := ne_of_gt (gammaAlpha_pos ha k)
   field_simp [hα]
-  ring
 
 end CrossBoundaryMomentKernels
