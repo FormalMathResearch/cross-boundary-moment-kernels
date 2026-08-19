@@ -104,7 +104,8 @@ theorem gammaLogProfile_strictConcaveOn_Ioi {a : ℝ} (ha : 0 < a) :
     have hquot : a / y < a / x := by
       exact (div_lt_div_iff₀ hy hx).2 (mul_lt_mul_of_pos_left hxy ha)
     linarith
-  exact hanti.strictConcaveOn_of_deriv (convex_Ioi (0 : ℝ)) hcont
+  apply StrictAntiOn.strictConcaveOn_of_deriv (convex_Ioi (0 : ℝ)) hcont
+  simpa using hanti
 
 /-- The concrete reversed-crossing example from manuscript Corollary 2.8. -/
 theorem gamma_a_one_reversed_crossing :
