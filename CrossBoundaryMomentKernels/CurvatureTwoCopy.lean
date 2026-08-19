@@ -187,10 +187,14 @@ theorem CurvaturePairingHypotheses.integral_curvatureCovarianceTwoCopyKernel
     rw [hsY, hsZ]
     ring
   rw [← integral_congr_ae hEq]
-  change
-    ∫ p,
-      (((fun p : ℝ × ℝ => q1 p.1 * f0 p.2) - (fun p => f1 p.1 * q0 p.2) -
-        (fun p => q0 p.1 * f1 p.2) + (fun p => f0 p.1 * q1 p.2)) p) ∂(μ.prod μ) = _
+  have hEfun : E =
+      (fun p : ℝ × ℝ => q1 p.1 * f0 p.2) -
+      (fun p : ℝ × ℝ => f1 p.1 * q0 p.2) -
+      (fun p : ℝ × ℝ => q0 p.1 * f1 p.2) +
+      (fun p : ℝ × ℝ => f0 p.1 * q1 p.2) := by
+    funext p
+    rfl
+  rw [hEfun]
   rw [integral_add ((h1.sub h2).sub h3) h4, integral_sub (h1.sub h2) h3,
     integral_sub h1 h2]
   simp only [integral_prod_mul]
