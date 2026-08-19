@@ -30,19 +30,15 @@ theorem integral_orderedSignedDensity_curvature_slice
         (Ioo (0 : ℝ) u ×ˢ Ioi u).indicator
           (fun p => curvatureSignedFubiniG h k p * q u) := by
     funext p
-    simp only [orderedSignedDensity, Set.indicator, mem_prod, mem_Ioo, mem_Ioi]
+    have hmem :
+        p ∈ Ioo (0 : ℝ) u ×ˢ Ioi u ↔
+          (0 < p.1 ∧ p.1 < u ∧ u < p.2) := by
+      simp only [mem_prod, mem_Ioo, mem_Ioi]
+      tauto
+    unfold orderedSignedDensity
     by_cases hp : 0 < p.1 ∧ p.1 < u ∧ u < p.2
-    · rw [if_pos hp, if_pos ⟨⟨hp.1, hp.2.1⟩, hp.2.2⟩]
-    · rw [if_neg hp]
-      have hnot : ¬ (0 < p.1 ∧ p.1 < u) ∨ ¬ u < p.2 := by
-        by_contra hn
-        push_neg at hn
-        exact hp ⟨hn.1.1, hn.1.2, hn.2⟩
-      rcases hnot with hleft | hright
-      · rw [if_neg (by simpa using hleft)]
-      · rw [if_neg (by
-          intro hm
-          exact hright hm.2)]
+    · rw [if_pos hp, Set.indicator_of_mem (hmem.mpr hp)]
+    · rw [if_neg hp, Set.indicator_of_notMem (fun hm => hp (hmem.mp hm))]
   rw [heqIndicator, integral_indicator (measurableSet_Ioo.prod measurableSet_Ioi)]
   change (∫ p : ℝ × ℝ,
       curvatureSignedFubiniG h k p * q u
@@ -95,11 +91,12 @@ theorem integral_orderedSignedDensity_curvature_slice_all
     have heqZero :
         (fun p : ℝ × ℝ => orderedSignedDensity (curvatureSignedFubiniG h k) q (p, u)) = 0 := by
       funext p
+      simp only [Pi.zero_apply]
       unfold orderedSignedDensity
       rw [if_neg]
       intro hp
       exact hu (lt_trans hp.1 hp.2.1)
-    rw [heqZero, integral_zero]
+    simp [heqZero]
 
 /-- **Signed Fubini identity in manuscript form.**
 The ordered two-copy integral with `∫_y^z V''` is equal to `∫_0^∞ V''(u) R_k(u) du`.
@@ -178,15 +175,14 @@ theorem CurvaturePairingHypotheses.signedFubini_eq_R
         filter_upwards [hqImp] with u huq
         by_cases hu : 0 < u
         · rw [if_pos hu, if_pos hu, ← huq hu]
-          rfl
         · rw [if_neg hu, if_neg hu]
       _ = ∫ u : ℝ in Ioi (0 : ℝ), deriv (deriv V) u * R h k u ∂volume := by
         rw [← integral_indicator measurableSet_Ioi]
         apply integral_congr_ae
         filter_upwards with u
         by_cases hu : 0 < u
-        · rw [if_pos hu, Set.indicator_of_mem hu]
-        · rw [if_neg hu, Set.indicator_of_notMem hu]
+        · simp [hu]
+        · simp [hu]
   calc
     (∫ p : ℝ × ℝ,
         (if 0 < p.1 then
