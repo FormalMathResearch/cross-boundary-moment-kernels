@@ -6,6 +6,16 @@ open MeasureTheory Set Filter
 
 namespace CrossBoundaryMomentKernels
 
+private lemma ae_positive_prod_kappa :
+    ∀ᵐ p ∂((volume.restrict (Ioi (0 : ℝ))).prod
+      (volume.restrict (Ioi (0 : ℝ)))),
+      p ∈ Ioi (0 : ℝ) ×ˢ Ioi (0 : ℝ) := by
+  refine (Measure.ae_prod_mem_iff_ae_ae_mem
+    (measurableSet_Ioi.prod measurableSet_Ioi)).2 ?_
+  filter_upwards [ae_restrict_mem measurableSet_Ioi] with y hy
+  filter_upwards [ae_restrict_mem measurableSet_Ioi] with z hz
+  exact ⟨hy, hz⟩
+
 /-- The covariance two-copy kernel at the next index is absolutely integrable.  This is the
 manuscript's second absolute-convergence estimate, using the `b_k` and `c_k` weighted-derivative
 hypotheses and no stronger assumption. -/
@@ -30,7 +40,7 @@ theorem CurvaturePairingHypotheses.curvatureCovarianceTwoCopyKernel_integrable_s
     exact (((hq2.mul_prod hf1).sub (hf2.mul_prod hq1)).sub
       (hq1.mul_prod hf2)).add (hf1.mul_prod hq2)
   have hEq : E =ᵐ[μ.prod μ] curvatureCovarianceTwoCopyKernel h V (k + 1) := by
-    filter_upwards [ae_positive_prod] with p hp
+    filter_upwards [ae_positive_prod_kappa] with p hp
     have hsY := momentIntegrand_succ h (k + 1) hp.1
     have hsZ := momentIntegrand_succ h (k + 1) hp.2
     dsimp [E, f1, f2, q1, q2, curvatureCovarianceTwoCopyKernel]
@@ -62,7 +72,7 @@ theorem CurvaturePairingHypotheses.integral_curvatureCovarianceTwoCopyKernel_suc
   have h3 := hq1.mul_prod hf2
   have h4 := hf1.mul_prod hq2
   have hEq : E =ᵐ[μ.prod μ] curvatureCovarianceTwoCopyKernel h V (k + 1) := by
-    filter_upwards [ae_positive_prod] with p hp
+    filter_upwards [ae_positive_prod_kappa] with p hp
     have hsY := momentIntegrand_succ h (k + 1) hp.1
     have hsZ := momentIntegrand_succ h (k + 1) hp.2
     dsimp [E, f1, f2, q1, q2, curvatureCovarianceTwoCopyKernel]
@@ -185,7 +195,10 @@ theorem CurvaturePairingHypotheses.integral_curvatureCombinedTwoCopyKernel
           ∂((volume.restrict (Ioi (0 : ℝ))).prod (volume.restrict (Ioi (0 : ℝ)))) -
         ∫ p, curvatureCovarianceTwoCopyKernel h V (k + 1) p
           ∂((volume.restrict (Ioi (0 : ℝ))).prod (volume.restrict (Ioi (0 : ℝ)))) := by
-  rw [curvatureCombinedTwoCopyKernel]
+  change
+    (∫ p, tau h k * curvatureCovarianceTwoCopyKernel h V k p -
+      curvatureCovarianceTwoCopyKernel h V (k + 1) p
+        ∂((volume.restrict (Ioi (0 : ℝ))).prod (volume.restrict (Ioi (0 : ℝ))))) = _
   rw [integral_sub H.curvatureCovarianceTwoCopyKernel_integrable.const_mul
     H.curvatureCovarianceTwoCopyKernel_integrable_succ]
   rw [integral_const_mul]
@@ -206,6 +219,10 @@ theorem CurvaturePairingHypotheses.momentCurvature_eq_combinedTwoCopy
   rw [momentRatioScale, momentRatioScale, tau_eq_curvature_moment_ratio h H.index]
   have hk1 : k + 1 - 1 = k := by omega
   rw [hk1]
+  have hA1 : momentA (1 + k) = momentB k := by
+    rw [Nat.add_comm]
+    exact (momentB_eq_A_succ k).symm
+  rw [hA1]
   field_simp [ne_of_gt (h.momentPositive (k - 1)), ne_of_gt (h.momentPositive k),
     ne_of_gt (h.momentPositive (k + 1)), ne_of_gt (momentA_pos H.index),
     ne_of_gt (show 0 < momentB k by rw [momentB]; positivity),
