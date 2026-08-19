@@ -28,8 +28,8 @@ theorem curvatureCombinedTwoCopyKernel_eq_manuscript
     curvatureCovarianceTwoCopyKernel_succ_eq_product h V k hy hz,
     curvatureCovarianceTwoCopyKernel, curvatureTwoCopyIntegrand]
   rw [Real.mul_rpow hy.le hz.le]
-  simp only [momentIntegrand, halfExponent, momentA]
-  ring
+  simp only [momentIntegrand, halfExponent, momentA, Real.rpow_eq_pow]
+  ring_nf
 
 /-- The manuscript's exact signed two-copy integrand is absolutely integrable on
 `(0,∞) × (0,∞)`.  This is inherited from the two covariance estimates already proved from the
