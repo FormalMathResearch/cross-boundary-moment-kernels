@@ -93,7 +93,7 @@ theorem CurvaturePairingHypotheses.weightedWeightDerivative_integrableOn
       (Real.continuousAt_rpow_const y r (.inl (ne_of_gt hy))).continuousWithinAt
     have hV : ContinuousWithinAt V (Ioi 0) y := H.smooth.continuousOn y hy
     have hexpV : ContinuousWithinAt (fun x : ℝ => Real.exp (-V x)) (Ioi 0) y :=
-      Real.continuous_exp.continuousAt.comp_continuousWithinAt y hV.neg
+      Real.continuous_exp.continuousAt.comp_continuousWithinAt hV.neg
     exact hpow.mul ((hderivCont y hy).neg.mul hexpV)
   have hfg : Set.EqOn f g (Ioi (0 : ℝ)) := by
     intro y hy
@@ -143,7 +143,8 @@ theorem curvature_improper_integration_by_parts
     exact H.weightedWeightDerivative_integrableOn Hr
   have hu'v : IntegrableOn
       ((fun y : ℝ => r * y ^ (r - 1)) * (fun y : ℝ => h y)) (Ioi 0) := by
-    change IntegrableOn (fun y : ℝ => (r * y ^ (r - 1)) * h y) (Ioi 0)
+    change Integrable (fun y : ℝ => (r * y ^ (r - 1)) * h y)
+      (volume.restrict (Ioi 0))
     simpa only [mul_assoc] using hmoment.const_mul r
   have hzero : Tendsto
       ((fun y : ℝ => y ^ r) * (fun y : ℝ => h y))
