@@ -64,7 +64,6 @@ lemma gamma_tau_eq_moment_ratio {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (h
   have hf2 : (2 : ℝ) * (k : ℝ) + 1 ≠ 0 := by linarith
   rw [tau, gamma_N_succ_eq ha k, N]
   field_simp [hIkm1, hIk, hIk1, hf1, hf2]
-  ring
 
 /-- The normalization scale `τ_k` in closed Gamma form. -/
 theorem gamma_tau_eq {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (hk : 1 ≤ k) :
@@ -82,7 +81,6 @@ theorem gamma_tau_eq {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (hk : 1 ≤ k
         gammaAlpha a k * (gammaAlpha a k - 1) := by
     rw [hrec1, hrec0]
     field_simp [hIkm1]
-    ring
   rw [gamma_tau_eq_moment_ratio ha hk, hratio, gammaCrossing, gammaAlpha]
   ring
 
@@ -133,7 +131,6 @@ theorem gamma_Rhat_eq {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (hk : 1 ≤ 
     ne_of_gt ((gammaFullSupportWeight a ha).momentPositive (k + 1))
   rw [Rhat, gamma_R_eq ha hk hu, gamma_N_succ_eq ha k]
   field_simp [hIk, hIk1]
-  ring
 
 /-- Exact normalized adjacent ratio from manuscript Theorem 2.7. -/
 theorem gamma_Z_succ_div_Z {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (hk : 1 ≤ k)
@@ -154,7 +151,6 @@ theorem gamma_Z_succ_div_Z {a : ℝ} (ha : -(1 / 2 : ℝ) < a) {k : ℕ} (hk : 1
     field_simp [hN]
   rw [Z, Z, gamma_K_succ_eq ha k hu, hNshift, gamma_tau_eq ha hk]
   field_simp [hK, hN, hα, hcross]
-  ring
 
 /-- Difference of consecutive explicit Gamma crossings. -/
 theorem gammaCrossing_succ_sub {a : ℝ} {k : ℕ} (hk : 1 ≤ k) :
@@ -168,8 +164,9 @@ theorem gammaCrossing_succ_sub {a : ℝ} {k : ℕ} (hk : 1 ≤ k) :
   have h2 : (2 : ℝ) * (k : ℝ) + 1 ≠ 0 := by linarith
   have h2a : 1 + (2 : ℝ) * (k : ℝ) ≠ 0 := by linarith
   have h2b : 1 + (k : ℝ) * 2 ≠ 0 := by linarith
-  field_simp [h1, h2, h2a, h2b]
-  ring
+  field_simp [h1, h2, h2a, h2b] <;>
+    field_simp [h2b] <;>
+    ring
 
 /-- Sharp adjacent-crossing threshold in the Gamma family. -/
 theorem gamma_crossing_order_iff {a : ℝ} {k : ℕ} (hk : 1 ≤ k) :
