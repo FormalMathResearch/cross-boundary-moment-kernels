@@ -157,4 +157,104 @@ theorem gammaNormalizedProduct_exp_neg_half_integrable
   have hcoef : (-(1 / 2 : ℝ)) ≤ 0 := by norm_num
   exact Real.exp_le_one_iff.mpr (mul_nonpos_of_nonpos_of_nonneg hcoef hp)
 
+/-- The positive half exponential moment of `X/u` is integrable. The proof uses only the
+cross-boundary rectangle `0<y≤u<z` and the Gamma upper-tail decay. -/
+theorem gammaNormalizedProduct_exp_half_integrable
+    {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (k : ℕ) {u : ℝ} (hu : 0 < u) :
+    Integrable (fun p => Real.exp ((1 / 2 : ℝ) * gammaNormalizedProduct u p))
+      (crossBoundaryMeasure (gammaFullSupportWeight a ha) k u) := by
+  let h := gammaFullSupportWeight a ha
+  let μL : Measure ℝ := volume.restrict (Ioc (0 : ℝ) u)
+  let μR : Measure ℝ := volume.restrict (Ioi u)
+  have hkL : Integrable (momentIntegrand h k) μL := by
+    simpa [h, μL, IntegrableOn] using
+      (h.momentIntegrable k).mono_set (by intro y hy; exact hy.1)
+  have hk1R : Integrable
+      (fun z : ℝ => momentIntegrand h (k + 1) z * Real.exp ((1 / 2 : ℝ) * z)) μR := by
+    simpa [h, μR] using gammaMomentIntegrand_mul_exp_half_integrable_Ioi ha (k + 1) hu
+  have hmajorProd : Integrable
+      (fun p : ℝ × ℝ => momentIntegrand h k p.1 *
+        (momentIntegrand h (k + 1) p.2 * Real.exp ((1 / 2 : ℝ) * p.2)))
+      (μL.prod μR) := hkL.mul_prod hk1R
+  have hmajor : Integrable
+      (fun p : ℝ × ℝ => (K h k u)⁻¹ *
+        (momentIntegrand h k p.1 *
+          (momentIntegrand h (k + 1) p.2 * Real.exp ((1 / 2 : ℝ) * p.2))))
+      (crossBoundaryBaseMeasure u) := by
+    simpa [crossBoundaryBaseMeasure, μL, μR] using hmajorProd.const_mul (K h k u)⁻¹
+  have hdenInt := crossBoundaryDensity_integrable h k hu
+  have hexpMeas : AEStronglyMeasurable
+      (fun p : ℝ × ℝ => Real.exp ((1 / 2 : ℝ) * gammaNormalizedProduct u p))
+      (crossBoundaryBaseMeasure u) :=
+    (Real.measurable_exp.comp
+      (measurable_const.mul (gammaNormalizedProduct_measurable u))).aestronglyMeasurable
+  have htargetMeas : AEStronglyMeasurable
+      (fun p : ℝ × ℝ => crossBoundaryDensity h k u p *
+        Real.exp ((1 / 2 : ℝ) * gammaNormalizedProduct u p))
+      (crossBoundaryBaseMeasure u) := hdenInt.1.mul hexpMeas
+  have hbase : Integrable
+      (fun p : ℝ × ℝ => crossBoundaryDensity h k u p *
+        Real.exp ((1 / 2 : ℝ) * gammaNormalizedProduct u p))
+      (crossBoundaryBaseMeasure u) := by
+    refine hmajor.mono htargetMeas ?_
+    filter_upwards [ae_mem_crossBoundaryRect u] with p hp
+    have hy : 0 < p.1 := hp.1.1
+    have hz : 0 < p.2 := lt_trans hu hp.2
+    have hyz : p.1 < p.2 := lt_of_le_of_lt hp.1.2 hp.2
+    have hMky : 0 ≤ momentIntegrand h k p.1 := momentIntegrand_nonneg h k hy
+    have hMkz : 0 ≤ momentIntegrand h k p.2 := momentIntegrand_nonneg h k hz
+    have hKinv : 0 ≤ (K h k u)⁻¹ := inv_nonneg.mpr (K_pos h k hu).le
+    have hxle : gammaNormalizedProduct u p ≤ p.2 := by
+      rw [gammaNormalizedProduct, crossBoundaryProduct, div_le_iff₀ hu]
+      calc
+        p.1 * p.2 ≤ u * p.2 := mul_le_mul_of_nonneg_right hp.1.2 hz.le
+        _ = p.2 * u := by ring
+    have hexpLe : Real.exp ((1 / 2 : ℝ) * gammaNormalizedProduct u p) ≤
+        Real.exp ((1 / 2 : ℝ) * p.2) := by
+      exact Real.exp_le_exp.mpr (mul_le_mul_of_nonneg_left hxle (by norm_num))
+    have hgap : 0 ≤ p.2 - p.1 := sub_nonneg.mpr hyz.le
+    have hgapLe : p.2 - p.1 ≤ p.2 := by linarith
+    have hcore :
+        (p.2 - p.1) * Real.exp ((1 / 2 : ℝ) * gammaNormalizedProduct u p) ≤
+          p.2 * Real.exp ((1 / 2 : ℝ) * p.2) :=
+      mul_le_mul hgapLe hexpLe (Real.exp_pos _).le hz.le
+    have hcoeff : 0 ≤ (K h k u)⁻¹ * momentIntegrand h k p.1 *
+        momentIntegrand h k p.2 := mul_nonneg (mul_nonneg hKinv hMky) hMkz
+    have hsucc := momentIntegrand_succ h k hz
+    rw [crossBoundaryDensity, crossBoundaryIntegrand, hsucc]
+    rw [Real.norm_eq_abs]
+    have hleftNonneg : 0 ≤
+        (K h k u)⁻¹ * (momentIntegrand h k p.1 * momentIntegrand h k p.2 *
+          (p.2 - p.1)) * Real.exp ((1 / 2 : ℝ) * gammaNormalizedProduct u p) := by
+      positivity
+    have hrightNonneg : 0 ≤
+        (K h k u)⁻¹ *
+          (momentIntegrand h k p.1 *
+            (p.2 * momentIntegrand h k p.2 * Real.exp ((1 / 2 : ℝ) * p.2))) := by
+      positivity
+    rw [abs_of_nonneg hleftNonneg, abs_of_nonneg hrightNonneg]
+    calc
+      (K h k u)⁻¹ * (momentIntegrand h k p.1 * momentIntegrand h k p.2 *
+          (p.2 - p.1)) * Real.exp ((1 / 2 : ℝ) * gammaNormalizedProduct u p) =
+          ((K h k u)⁻¹ * momentIntegrand h k p.1 * momentIntegrand h k p.2) *
+            ((p.2 - p.1) * Real.exp ((1 / 2 : ℝ) * gammaNormalizedProduct u p)) := by ring
+      _ ≤ ((K h k u)⁻¹ * momentIntegrand h k p.1 * momentIntegrand h k p.2) *
+            (p.2 * Real.exp ((1 / 2 : ℝ) * p.2)) :=
+        mul_le_mul_of_nonneg_left hcore hcoeff
+      _ = (K h k u)⁻¹ *
+          (momentIntegrand h k p.1 *
+            (p.2 * momentIntegrand h k p.2 * Real.exp ((1 / 2 : ℝ) * p.2))) := by ring
+  have hmeas : AEMeasurable
+      (fun p => ENNReal.ofReal (crossBoundaryDensity h k u p))
+      (crossBoundaryBaseMeasure u) := hdenInt.1.aemeasurable.ennreal_ofReal
+  have htop : ∀ᵐ p ∂crossBoundaryBaseMeasure u,
+      ENNReal.ofReal (crossBoundaryDensity h k u p) < ∞ := by
+    filter_upwards with p
+    exact ENNReal.ofReal_lt_top
+  rw [crossBoundaryMeasure,
+    integrable_withDensity_iff_integrable_smul₀' hmeas htop]
+  apply hbase.congr
+  filter_upwards [crossBoundaryDensity_nonneg_ae h k hu] with p hp
+  simp [ENNReal.toReal_ofReal hp, smul_eq_mul]
+
 end CrossBoundaryMomentKernels
