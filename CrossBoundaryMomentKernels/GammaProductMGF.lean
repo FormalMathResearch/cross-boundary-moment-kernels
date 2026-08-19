@@ -98,7 +98,11 @@ lemma gammaMomentIntegrand_mul_exp_half_integrable_Ioi
       ProbabilityTheory.gammaPDFReal α 1 z * Real.exp ((1 / 2 : ℝ) * z)) :=
     gammaPDFReal_mul_exp_integrable_of_lt_one hα (by norm_num)
   have hscaled := hpdf.const_mul (Real.Gamma α)
-  have hrestrict := hscaled.mono_measure (Measure.restrict_le_self)
+  have hrestrict : Integrable
+      (fun z : ℝ => Real.Gamma α *
+        (ProbabilityTheory.gammaPDFReal α 1 z * Real.exp ((1 / 2 : ℝ) * z)))
+      (volume.restrict (Ioi u)) :=
+    hscaled.mono_measure Measure.restrict_le_self
   apply hrestrict.congr
   refine (ae_restrict_iff' measurableSet_Ioi).2 ?_
   filter_upwards with z hz
