@@ -41,3 +41,4 @@ import CrossBoundaryMomentKernels.CurvatureTwoCopyKappa
 import CrossBoundaryMomentKernels.CurvatureTwoCopyManuscript
 import CrossBoundaryMomentKernels.CurvatureFTC
 import CrossBoundaryMomentKernels.CurvatureTonelli
+import CrossBoundaryMomentKernels.CurvatureEnvelopeIntegrability
