@@ -124,7 +124,7 @@ The proof uses the improper integration-by-parts theorem on `(0,∞)`; its bound
 exactly the two limits assumed in the manuscript. -/
 theorem curvature_improper_integration_by_parts
     {h : FullSupportMomentWeight} {V : ℝ → ℝ} {k : ℕ}
-    (H : CurvaturePairingHypotheses h V k) {r : ℝ} (hr : 0 < r)
+    (H : CurvaturePairingHypotheses h V k) {r : ℝ} (_hr : 0 < r)
     (Hr : CurvatureExponentHypotheses h V r)
     (hmoment : IntegrableOn (fun y : ℝ => y ^ (r - 1) * h y) (Ioi 0)) :
     ∫ y in Ioi (0 : ℝ), y ^ r * deriv V y * h y =
