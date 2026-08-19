@@ -23,10 +23,10 @@ theorem gamma_J_eq_partial {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (k : ℕ) {u : �
     J (gammaFullSupportWeight a ha) k u = gammaPartial (gammaAlpha a k) u := by
   rw [J, gammaPartial, intervalIntegral.integral_of_le hu]
   exact setIntegral_congr_fun measurableSet_Ioc fun y hy =>
-    gammaMomentIntegrand_eq a k (lt_of_lt_of_le hy.1 hu)
+    gammaMomentIntegrand_eq a k hy.1
 
 /-- Compatibility of mathlib's complex lower incomplete Gamma integral with the real one. -/
-lemma complex_partialGamma_ofReal {s u : ℝ} (hs : 0 < s) (hu : 0 ≤ u) :
+lemma complex_partialGamma_ofReal {s u : ℝ} (_hs : 0 < s) (hu : 0 ≤ u) :
     Complex.partialGamma (s : ℂ) u = (gammaPartial s u : ℂ) := by
   rw [Complex.partialGamma, gammaPartial, ← intervalIntegral.integral_ofReal]
   apply intervalIntegral.integral_congr
@@ -51,7 +51,6 @@ theorem gammaPartial_add_one {s u : ℝ} (hs : 0 < s) (hu : 0 ≤ u) :
       (((Real.exp (-u) * u ^ s : ℝ) : ℂ)) =
         ((-u : ℝ).exp : ℂ) * (u : ℂ) ^ (s : ℂ) := by
     rw [Complex.ofReal_mul, Complex.ofReal_cpow hu]
-    norm_cast
   rw [← hboundary] at hc
   exact_mod_cast hc
 
@@ -70,6 +69,8 @@ theorem gamma_J_succ {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (k : ℕ) {u : ℝ}
 theorem gamma_I_succ {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (k : ℕ) :
     I (gammaFullSupportWeight a ha) (k + 1) =
       gammaAlpha a k * I (gammaFullSupportWeight a ha) k := by
+  change I (gammaModelWeight a) (k + 1) =
+    gammaAlpha a k * I (gammaModelWeight a) k
   rw [gamma_I_eq_Gamma ha (k + 1), gamma_I_eq_Gamma ha k, gammaAlpha_succ]
   exact Real.Gamma_add_one (ne_of_gt (gammaAlpha_pos ha k))
 
