@@ -22,8 +22,9 @@ def curvatureTiltedMeasure
 lemma curvatureTiltedDensity_integrable
     (h : FullSupportMomentWeight) (k : ℕ) :
     Integrable (curvatureTiltedDensity h k) (volume.restrict (Ioi (0 : ℝ))) := by
-  simpa [curvatureTiltedDensity, IntegrableOn] using
-    (h.momentIntegrable k).const_mul (I h k)⁻¹
+  change Integrable (fun y : ℝ => (I h k)⁻¹ * momentIntegrand h k y)
+    (volume.restrict (Ioi (0 : ℝ)))
+  exact (h.momentIntegrable k).const_mul (I h k)⁻¹
 
 lemma curvatureTiltedDensity_nonneg_ae
     (h : FullSupportMomentWeight) (k : ℕ) :
@@ -103,7 +104,8 @@ theorem CurvaturePairingHypotheses.curvatureTilted_expectation_deriv
       (fun y : ℝ ↦ (I h k)⁻¹ *
         (y ^ momentA k * deriv V y * h y)) := by
     filter_upwards [ae_restrict_mem measurableSet_Ioi] with y hy
-    simp only [curvatureTiltedDensity, momentIntegrand, momentA, halfExponent]
+    simp only [curvatureTiltedDensity, momentIntegrand, momentA, halfExponent,
+      Real.rpow_eq_pow]
     ring
   rw [integral_congr_ae hEq, integral_const_mul, H.ibp_at_A]
   rw [momentRatioScale]
@@ -118,6 +120,8 @@ theorem CurvaturePairingHypotheses.curvatureTilted_expectation_id
       momentB k * momentRatioScale h (k + 1) := by
   rw [curvatureTilted_expectation_id_eq_I_ratio]
   rw [momentRatioScale, ← momentB_eq_A_succ]
+  have hk : k + 1 - 1 = k := by omega
+  rw [hk]
   have hB : momentB k ≠ 0 := by
     rw [momentB]
     positivity
@@ -136,11 +140,16 @@ theorem CurvaturePairingHypotheses.curvatureTilted_expectation_id_mul_deriv
         (y ^ momentB k * deriv V y * h y)) := by
     filter_upwards [ae_restrict_mem measurableSet_Ioi] with y hy
     have hs := momentIntegrand_succ h k hy
-    rw [curvatureTiltedDensity]
-    rw [← hs]
-    simp only [momentIntegrand, halfExponent, momentB]
-    push_cast
-    ring_nf
+    calc
+      curvatureTiltedDensity h k y * (y * deriv V y) =
+          (I h k)⁻¹ * ((y * momentIntegrand h k y) * deriv V y) := by
+            rw [curvatureTiltedDensity]
+            ring
+      _ = (I h k)⁻¹ * (momentIntegrand h (k + 1) y * deriv V y) := by rw [← hs]
+      _ = (I h k)⁻¹ * (y ^ momentB k * deriv V y * h y) := by
+        simp only [momentIntegrand, halfExponent, momentB, Real.rpow_eq_pow]
+        push_cast
+        ring
   rw [integral_congr_ae hEq, integral_const_mul, H.ibp_at_B]
   field_simp [ne_of_gt (h.momentPositive k)]
 
@@ -166,7 +175,6 @@ theorem CurvaturePairingHypotheses.curvatureCovariance_eq
       (mul_ne_zero (ne_of_gt (momentA_pos H.index))
         (ne_of_gt (h.momentPositive (k - 1))))
   field_simp [hs]
-  ring
 
 /-- The first difference identity
 `s_k - s_{k+1} = (s_k/b_k) C_k`. -/
@@ -185,6 +193,5 @@ theorem CurvaturePairingHypotheses.momentRatioScale_sub_succ_eq_covariance
     rw [momentB]
     positivity
   field_simp [hs, hB]
-  ring
 
 end CrossBoundaryMomentKernels
