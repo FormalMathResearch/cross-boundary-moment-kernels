@@ -111,10 +111,8 @@ lemma gammaMomentIntegrand_mul_exp_half_integrable_Ioi
       (ProbabilityTheory.gammaPDFReal α 1 z * Real.exp ((1 / 2 : ℝ) * z)) =
     momentIntegrand (gammaModelWeight a) j z * Real.exp ((1 / 2 : ℝ) * z)
   rw [gammaMomentIntegrand_eq a j hz0]
+  rw [show gammaAlpha a j = α by rfl]
   simp [ProbabilityTheory.gammaPDFReal, hz0.le]
-  change Real.Gamma α *
-      ((Real.Gamma α)⁻¹ * z ^ (α - 1) * Real.exp (-z) * Real.exp ((1 / 2 : ℝ) * z)) =
-    Real.exp (-z) * z ^ (α - 1) * Real.exp ((1 / 2 : ℝ) * z)
   field_simp [hGamma]
   ring
 
@@ -222,7 +220,7 @@ theorem gammaNormalizedProduct_exp_half_integrable
         momentIntegrand h k p.2 := mul_nonneg (mul_nonneg hKinv hMky) hMkz
     have hsucc := momentIntegrand_succ h k hz
     rw [crossBoundaryDensity, crossBoundaryIntegrand, hsucc]
-    rw [Real.norm_eq_abs]
+    simp only [Real.norm_eq_abs]
     have hleftNonneg : 0 ≤
         (K h k u)⁻¹ * (momentIntegrand h k p.1 * momentIntegrand h k p.2 *
           (p.2 - p.1)) * Real.exp ((1 / 2 : ℝ) * gammaNormalizedProduct u p) := by
