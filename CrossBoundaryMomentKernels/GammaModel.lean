@@ -122,8 +122,7 @@ def gammaFullSupportWeight (a : ℝ) (ha : -(1 / 2 : ℝ) < a) : FullSupportMome
       · exact inter_subset_right
       · intro y hy
         exact ⟨ne_of_gt (gammaModelWeight_pos a (lt_trans hA hy.1)), hy⟩
-    rw [setIntegral_pos_iff_support_of_nonneg_ae hnonneg hint, hsupp]
-    rw [volume_Ioc]
+    rw [setIntegral_pos_iff_support_of_nonneg_ae hnonneg hint, hsupp, Real.volume_Ioc]
     exact ENNReal.ofReal_pos.mpr (sub_pos.mpr hAB)
   momentIntegrable := by
     intro k
