@@ -275,7 +275,10 @@ lemma gammaMeasure_Ioo_subset_interior_integrableExpSet
         (ProbabilityTheory.gammaMeasure α 1)) := by
   apply interior_maximal
   · intro t ht
-    simpa using gammaMeasure_exp_integrable_of_lt_one hα (show t < 1 by linarith [ht.2])
+    change Integrable (fun x : ℝ => Real.exp (t * id x))
+      (ProbabilityTheory.gammaMeasure α 1)
+    simpa using gammaMeasure_exp_integrable_of_lt_one hα
+      (show t < 1 by linarith [ht.2])
   · exact isOpen_Ioo
 
 end CrossBoundaryMomentKernels
