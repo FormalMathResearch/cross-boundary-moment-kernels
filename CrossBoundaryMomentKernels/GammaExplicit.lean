@@ -159,13 +159,12 @@ theorem gammaCrossing_succ_sub {a : ℝ} {k : ℕ} (hk : 1 ≤ k) :
         (((2 : ℝ) * (k : ℝ) - 1) * ((2 : ℝ) * (k : ℝ) + 1)) := by
   have hkR : (1 : ℝ) ≤ (k : ℝ) := by exact_mod_cast hk
   rw [gammaCrossing, gammaCrossing]
-  push_cast
-  have h1 : (2 : ℝ) * (k : ℝ) - 1 ≠ 0 := by linarith
-  have h2 : (2 : ℝ) * (k : ℝ) + 1 ≠ 0 := by linarith
-  have h2a : 1 + (2 : ℝ) * (k : ℝ) ≠ 0 := by linarith
-  have h2b : 1 + (k : ℝ) * 2 ≠ 0 := by linarith
-  field_simp [h1, h2, h2a, h2b] <;>
-    ring
+  norm_num only [Nat.cast_add, Nat.cast_one]
+  have hdenSucc : (2 : ℝ) * ((k : ℝ) + 1) - 1 ≠ 0 := by linarith
+  have hden : (2 : ℝ) * (k : ℝ) - 1 ≠ 0 := by linarith
+  have hplus : (2 : ℝ) * (k : ℝ) + 1 ≠ 0 := by linarith
+  field_simp [hdenSucc, hden, hplus]
+  ring
 
 /-- Sharp adjacent-crossing threshold in the Gamma family. -/
 theorem gamma_crossing_order_iff {a : ℝ} {k : ℕ} (hk : 1 ≤ k) :
