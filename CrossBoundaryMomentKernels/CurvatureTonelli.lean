@@ -21,7 +21,11 @@ theorem orderedTonelliDensity_measurable
     (hg : Measurable g) (hq : Measurable q) :
     Measurable (orderedTonelliDensity g q) := by
   unfold orderedTonelliDensity
-  measurability
+  have hs : MeasurableSet
+      {p : (ℝ × ℝ) × ℝ | 0 < p.1.1 ∧ p.1.1 < p.2 ∧ p.2 < p.1.2} := by
+    measurability
+  exact Measurable.ite hs
+    ((hg.comp measurable_fst).mul (hq.comp measurable_snd)) measurable_const
 
 /-- Tonelli may swap the pair variable `(y,z)` with the middle variable `u` on the
 nonnegative region `0 < y < u < z`, without any integrability hypothesis.
