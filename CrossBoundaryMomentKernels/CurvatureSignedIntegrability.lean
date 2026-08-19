@@ -41,8 +41,7 @@ theorem ofReal_abs_curvatureSignedFubiniG_eq_envelopeTonelliDensity
   congr 1
   simp only [abs_mul, abs_of_nonneg (by norm_num : (0 : ℝ) ≤ 2),
     abs_of_pos (Real.exp_pos _), abs_of_nonneg hgap,
-    abs_of_nonneg hhy, abs_of_nonneg hhz, abs_abs]
-  ring
+    abs_of_nonneg hhy, abs_of_nonneg hhz]
 
 /-- The actual second derivative is a.e. measurable on the manuscript domain, as a direct
 consequence of `V ∈ C²(0,∞)`. -/
