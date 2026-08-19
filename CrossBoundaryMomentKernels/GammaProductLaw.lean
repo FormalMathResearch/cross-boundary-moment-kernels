@@ -35,7 +35,6 @@ lemma gamma_K_add_ratio {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (k m : ℕ) {u : ℝ
     gammaAlpha_add_index]
   rw [Real.rpow_add hu, Real.rpow_natCast]
   field_simp [hIk, hu0, hexp]
-  ring
 
 /-- **Normalized Gamma cross-boundary moments.** Under `ν_{k,u}`, the variable `X/u` has
 moments `Γ(α_k+m)/Γ(α_k)`. -/
@@ -46,8 +45,6 @@ theorem gamma_normalizedProduct_moment {a : ℝ} (ha : -(1 / 2 : ℝ) < a)
       Real.Gamma (gammaAlpha a (k + m)) / Real.Gamma (gammaAlpha a k) := by
   have hu0 : u ≠ 0 := ne_of_gt hu
   have hpow : u ^ m ≠ 0 := pow_ne_zero m hu0
-  have hI : I (gammaFullSupportWeight a ha) k ≠ 0 :=
-    ne_of_gt ((gammaFullSupportWeight a ha).momentPositive k)
   calc
     ∫ p, (gammaNormalizedProduct u p) ^ m
         ∂crossBoundaryMeasure (gammaFullSupportWeight a ha) k u =
@@ -61,11 +58,12 @@ theorem gamma_normalizedProduct_moment {a : ℝ} (ha : -(1 / 2 : ℝ) < a)
     _ = u⁻¹ ^ m *
         (K (gammaFullSupportWeight a ha) (k + m) u /
           K (gammaFullSupportWeight a ha) k u) := by
-      rw [crossBoundary_moment_identity]
+      rw [crossBoundary_moment_identity (gammaFullSupportWeight a ha) k m hu]
     _ = I (gammaFullSupportWeight a ha) (k + m) /
         I (gammaFullSupportWeight a ha) k := by
       rw [gamma_K_add_ratio ha k m hu]
-      field_simp [hu0, hpow]
+      rw [← inv_pow]
+      field_simp [hpow]
     _ = Real.Gamma (gammaAlpha a (k + m)) / Real.Gamma (gammaAlpha a k) := by
       change I (gammaModelWeight a) (k + m) / I (gammaModelWeight a) k = _
       rw [gamma_I_eq_Gamma ha (k + m), gamma_I_eq_Gamma ha k]
@@ -74,7 +72,6 @@ theorem gamma_normalizedProduct_moment {a : ℝ} (ha : -(1 / 2 : ℝ) < a)
 theorem gammaMeasure_moment {α : ℝ} (hα : 0 < α) (m : ℕ) :
     ∫ x : ℝ, x ^ m ∂ProbabilityTheory.gammaMeasure α 1 =
       Real.Gamma (α + m) / Real.Gamma α := by
-  let μ := ProbabilityTheory.gammaMeasure α 1
   have hpdf_nonneg : ∀ x : ℝ, 0 ≤ ProbabilityTheory.gammaPDFReal α 1 x :=
     ProbabilityTheory.gammaPDFReal_nonneg hα (by norm_num)
   have hmeas : AEMeasurable (ProbabilityTheory.gammaPDF α 1) volume := by
@@ -82,7 +79,6 @@ theorem gammaMeasure_moment {α : ℝ} (hα : 0 < α) (m : ℕ) :
   have htop : ∀ᵐ x ∂volume, ProbabilityTheory.gammaPDF α 1 x < ∞ := by
     filter_upwards with x
     exact ENNReal.ofReal_lt_top
-  change ∫ x : ℝ, x ^ m ∂μ = _
   rw [ProbabilityTheory.gammaMeasure,
     integral_withDensity_eq_integral_toReal_smul₀ hmeas htop]
   simp_rw [ProbabilityTheory.gammaPDF, ENNReal.toReal_ofReal (hpdf_nonneg _), smul_eq_mul]
@@ -94,8 +90,7 @@ theorem gammaMeasure_moment {α : ℝ} (hα : 0 < α) (m : ℕ) :
       filter_upwards with x
       by_cases hx : 0 ≤ x
       · simp [Set.indicator_of_mem hx]
-      · have hx' : x < 0 := lt_of_not_ge hx
-        simp [Set.indicator_of_not_mem hx, ProbabilityTheory.gammaPDFReal, hx]
+      · simp [Set.indicator_of_not_mem hx, ProbabilityTheory.gammaPDFReal, hx]
     _ = ∫ x : ℝ in Ioi 0,
         (1 / Real.Gamma α) * x ^ (α + m - 1) * Real.exp (-x) := by
       rw [integral_Ici_eq_integral_Ioi]
