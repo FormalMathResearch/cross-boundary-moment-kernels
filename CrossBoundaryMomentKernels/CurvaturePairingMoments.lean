@@ -38,10 +38,11 @@ theorem CurvaturePairingHypotheses.ibp_at_A
       (volume.restrict (Ioi 0))
     apply (h.momentIntegrable (k - 1)).congr
     filter_upwards with y
-    simp only [momentIntegrand, momentA_sub_one_eq_halfExponent_pred H.index]
+    simp only [momentIntegrand, momentA_sub_one_eq_halfExponent_pred H.index,
+      Real.rpow_eq_pow]
   have hibp := curvature_improper_integration_by_parts H (momentA_pos H.index) H.atA hmoment
   rw [momentA_sub_one_eq_halfExponent_pred H.index] at hibp
-  simpa [I, momentIntegrand] using hibp
+  simpa [I, momentIntegrand, Real.rpow_eq_pow] using hibp
 
 /-- The second specialization printed immediately after manuscript Lemma 5.1. -/
 theorem CurvaturePairingHypotheses.ibp_at_B
@@ -58,10 +59,10 @@ theorem CurvaturePairingHypotheses.ibp_at_B
       (volume.restrict (Ioi 0))
     apply (h.momentIntegrable k).congr
     filter_upwards with y
-    simp only [momentIntegrand, momentB_sub_one_eq_halfExponent]
+    simp only [momentIntegrand, momentB_sub_one_eq_halfExponent, Real.rpow_eq_pow]
   have hibp := curvature_improper_integration_by_parts H hBpos H.atB hmoment
   rw [momentB_sub_one_eq_halfExponent] at hibp
-  simpa [I, momentIntegrand] using hibp
+  simpa [I, momentIntegrand, Real.rpow_eq_pow] using hibp
 
 /-- The third specialization printed immediately after manuscript Lemma 5.1. -/
 theorem CurvaturePairingHypotheses.ibp_at_C
@@ -78,10 +79,11 @@ theorem CurvaturePairingHypotheses.ibp_at_C
       (volume.restrict (Ioi 0))
     apply (h.momentIntegrable (k + 1)).congr
     filter_upwards with y
-    simp only [momentIntegrand, momentC_sub_one_eq_halfExponent_succ]
+    simp only [momentIntegrand, momentC_sub_one_eq_halfExponent_succ,
+      Real.rpow_eq_pow]
   have hibp := curvature_improper_integration_by_parts H hCpos H.atC hmoment
   rw [momentC_sub_one_eq_halfExponent_succ] at hibp
-  simpa [I, momentIntegrand] using hibp
+  simpa [I, momentIntegrand, Real.rpow_eq_pow] using hibp
 
 /-- The three identities used in manuscript Section 5, packaged in the printed order
 `a_k`, `b_k`, `c_k`. -/
