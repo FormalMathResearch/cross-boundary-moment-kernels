@@ -195,11 +195,26 @@ theorem CurvaturePairingHypotheses.integral_curvatureCovarianceTwoCopyKernel
     funext p
     rfl
   rw [hEfun]
-  change
-    (∫ p, (q1 p.1 * f0 p.2 - f1 p.1 * q0 p.2 - q0 p.1 * f1 p.2) +
-        f0 p.1 * q1 p.2 ∂(μ.prod μ)) = _
-  rw [integral_add ((h1.sub h2).sub h3) h4, integral_sub (h1.sub h2) h3,
-    integral_sub h1 h2]
+  have hadd :
+      (∫ p, (q1 p.1 * f0 p.2 - f1 p.1 * q0 p.2 - q0 p.1 * f1 p.2) +
+          f0 p.1 * q1 p.2 ∂(μ.prod μ)) =
+        (∫ p, q1 p.1 * f0 p.2 - f1 p.1 * q0 p.2 - q0 p.1 * f1 p.2
+            ∂(μ.prod μ)) +
+          ∫ p, f0 p.1 * q1 p.2 ∂(μ.prod μ) := by
+    simpa only [Pi.add_apply, Pi.sub_apply] using
+      (integral_add ((h1.sub h2).sub h3) h4)
+  have hsub3 :
+      (∫ p, q1 p.1 * f0 p.2 - f1 p.1 * q0 p.2 - q0 p.1 * f1 p.2
+          ∂(μ.prod μ)) =
+        (∫ p, q1 p.1 * f0 p.2 - f1 p.1 * q0 p.2 ∂(μ.prod μ)) -
+          ∫ p, q0 p.1 * f1 p.2 ∂(μ.prod μ) := by
+    simpa only [Pi.sub_apply] using integral_sub (h1.sub h2) h3
+  have hsub2 :
+      (∫ p, q1 p.1 * f0 p.2 - f1 p.1 * q0 p.2 ∂(μ.prod μ)) =
+        (∫ p, q1 p.1 * f0 p.2 ∂(μ.prod μ)) -
+          ∫ p, f1 p.1 * q0 p.2 ∂(μ.prod μ) := by
+    simpa only [Pi.sub_apply] using integral_sub h1 h2
+  rw [hadd, hsub3, hsub2]
   simp only [integral_prod_mul]
   change
     (∫ y, momentIntegrand h (k + 1) y * deriv V y ∂μ) * I h k -
