@@ -34,8 +34,11 @@ theorem CurvaturePairingHypotheses.ibp_at_A
       momentA k * I h (k - 1) := by
   have hmoment :
       IntegrableOn (fun y : ℝ => y ^ (momentA k - 1) * h y) (Ioi 0) := by
-    rw [momentA_sub_one_eq_halfExponent_pred H.index]
-    simpa [momentIntegrand] using h.momentIntegrable (k - 1)
+    change Integrable (fun y : ℝ => y ^ (momentA k - 1) * h y)
+      (volume.restrict (Ioi 0))
+    apply (h.momentIntegrable (k - 1)).congr
+    filter_upwards with y
+    simp only [momentIntegrand, momentA_sub_one_eq_halfExponent_pred H.index]
   have hibp := curvature_improper_integration_by_parts H (momentA_pos H.index) H.atA hmoment
   rw [momentA_sub_one_eq_halfExponent_pred H.index] at hibp
   simpa [I, momentIntegrand] using hibp
@@ -51,8 +54,11 @@ theorem CurvaturePairingHypotheses.ibp_at_B
     exact momentA_pos (by omega)
   have hmoment :
       IntegrableOn (fun y : ℝ => y ^ (momentB k - 1) * h y) (Ioi 0) := by
-    rw [momentB_sub_one_eq_halfExponent]
-    simpa [momentIntegrand] using h.momentIntegrable k
+    change Integrable (fun y : ℝ => y ^ (momentB k - 1) * h y)
+      (volume.restrict (Ioi 0))
+    apply (h.momentIntegrable k).congr
+    filter_upwards with y
+    simp only [momentIntegrand, momentB_sub_one_eq_halfExponent]
   have hibp := curvature_improper_integration_by_parts H hBpos H.atB hmoment
   rw [momentB_sub_one_eq_halfExponent] at hibp
   simpa [I, momentIntegrand] using hibp
@@ -68,8 +74,11 @@ theorem CurvaturePairingHypotheses.ibp_at_C
     exact momentA_pos (by omega)
   have hmoment :
       IntegrableOn (fun y : ℝ => y ^ (momentC k - 1) * h y) (Ioi 0) := by
-    rw [momentC_sub_one_eq_halfExponent_succ]
-    simpa [momentIntegrand] using h.momentIntegrable (k + 1)
+    change Integrable (fun y : ℝ => y ^ (momentC k - 1) * h y)
+      (volume.restrict (Ioi 0))
+    apply (h.momentIntegrable (k + 1)).congr
+    filter_upwards with y
+    simp only [momentIntegrand, momentC_sub_one_eq_halfExponent_succ]
   have hibp := curvature_improper_integration_by_parts H hCpos H.atC hmoment
   rw [momentC_sub_one_eq_halfExponent_succ] at hibp
   simpa [I, momentIntegrand] using hibp
