@@ -107,4 +107,34 @@ theorem gammaNormalizedProduct_complexMGF_eqOn_strip
     · simpa using hx_tendsto.2
   · simpa using hx_eq n
 
+/-- **Manuscript Proposition 2.10.** Under the Gamma cross-boundary probability law, the
+normalized product `X/u` has exactly the unit-rate Gamma distribution with shape `α_k`.
+The conclusion is an equality of pushforward probability measures, not merely moment matching. -/
+theorem gamma_normalizedProduct_map_eq_gammaMeasure
+    {a : ℝ} (ha : -(1 / 2 : ℝ) < a) (k : ℕ) {u : ℝ} (hu : 0 < u) :
+    (crossBoundaryMeasure (gammaFullSupportWeight a ha) k u).map
+        (gammaNormalizedProduct u) =
+      ProbabilityTheory.gammaMeasure (gammaAlpha a k) 1 := by
+  letI : IsProbabilityMeasure
+      (crossBoundaryMeasure (gammaFullSupportWeight a ha) k u) :=
+    crossBoundaryMeasure_isProbability (gammaFullSupportWeight a ha) k hu
+  letI : IsProbabilityMeasure
+      (ProbabilityTheory.gammaMeasure (gammaAlpha a k) 1) :=
+    ProbabilityTheory.isProbabilityMeasure_gammaMeasure (gammaAlpha_pos ha k) (by norm_num)
+  have hstrip := gammaNormalizedProduct_complexMGF_eqOn_strip ha k hu
+  have hchar :
+      charFun ((crossBoundaryMeasure (gammaFullSupportWeight a ha) k u).map
+        (gammaNormalizedProduct u)) =
+        charFun (ProbabilityTheory.gammaMeasure (gammaAlpha a k) 1) := by
+    funext t
+    have hz : ((t : ℂ) * Complex.I).re ∈
+        Ioo (-(1 / 2 : ℝ)) (1 / 2 : ℝ) := by
+      norm_num
+    have heq := hstrip hz
+    rw [ProbabilityTheory.complexMGF_mul_I
+      (gammaNormalizedProduct_measurable u).aemeasurable t,
+      ProbabilityTheory.complexMGF_id_mul_I t] at heq
+    exact heq
+  exact Measure.ext_of_charFun hchar
+
 end CrossBoundaryMomentKernels
