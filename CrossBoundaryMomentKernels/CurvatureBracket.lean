@@ -25,9 +25,9 @@ theorem curvatureSignedEnvelopeDensity_eq_crossBoundary_difference
   have hz1 := momentIntegrand_succ h k hz
   rw [curvatureSignedEnvelopeDensity, crossBoundaryIntegrand, crossBoundaryIntegrand,
     hy1, hz1]
-  simp only [momentIntegrand, ← momentA_eq_halfExponent]
   rw [Real.mul_rpow hy.le hz.le]
-  ring
+  simp only [momentIntegrand, halfExponent, momentA, Real.rpow_eq_pow]
+  ring_nf
 
 /-- The cross-boundary kernel is integrable on every manuscript rectangle
 `0 < y ≤ u < z`, solely from the moment assumptions. -/
@@ -69,20 +69,21 @@ theorem crossBoundaryIntegrand_integrable_rectangle
   have hright : ∀ᵐ z ∂μR, z ∈ Ioi u := by
     dsimp [μR]
     exact ae_restrict_mem measurableSet_Ioi
+  have hrect : ∀ᵐ p ∂(μL.prod μR), p ∈ Ioc (0 : ℝ) u ×ˢ Ioi u := by
+    refine (Measure.ae_prod_mem_iff_ae_ae_mem
+      (measurableSet_Ioc.prod measurableSet_Ioi)).2 ?_
+    filter_upwards [hleft] with y hy
+    filter_upwards [hright] with z hz
+    exact ⟨hy, hz⟩
   have heq : D =ᵐ[μL.prod μR] crossBoundaryIntegrand h j := by
-    refine Measure.ae_prod_mem_iff_ae_ae_mem
-      (measurableSet_Ioc.prod measurableSet_Ioi) |>.2 ?_ |>.mono ?_
-    · filter_upwards [hleft] with y hy
-      filter_upwards [hright] with z hz
-      exact ⟨hy, hz⟩
-    · intro p hp
-      have hy : 0 < p.1 := hp.1.1
-      have hz : 0 < p.2 := lt_trans hu hp.2
-      have hy1 := momentIntegrand_succ h j hy
-      have hz1 := momentIntegrand_succ h j hz
-      dsimp [D, crossBoundaryIntegrand]
-      rw [hy1, hz1]
-      ring
+    filter_upwards [hrect] with p hp
+    have hy : 0 < p.1 := hp.1.1
+    have hz : 0 < p.2 := lt_trans hu hp.2
+    have hy1 := momentIntegrand_succ h j hy
+    have hz1 := momentIntegrand_succ h j hz
+    dsimp [D, crossBoundaryIntegrand]
+    rw [hy1, hz1]
+    ring
   simpa [μL, μR] using hD.congr heq
 
 /-- **Inner-bracket identification from manuscript Section 5.**
@@ -105,18 +106,19 @@ theorem curvatureSignedEnvelopeIntegral_eq_R_half
   have hright : ∀ᵐ z ∂μR, z ∈ Ioi u := by
     dsimp [μR]
     exact ae_restrict_mem measurableSet_Ioi
+  have hrect : ∀ᵐ p ∂(μL.prod μR), p ∈ Ioc (0 : ℝ) u ×ˢ Ioi u := by
+    refine (Measure.ae_prod_mem_iff_ae_ae_mem
+      (measurableSet_Ioc.prod measurableSet_Ioi)).2 ?_
+    filter_upwards [hleft] with y hy
+    filter_upwards [hright] with z hz
+    exact ⟨hy, hz⟩
   have heq :
       curvatureSignedEnvelopeDensity h k =ᵐ[μL.prod μR]
         (fun p => tau h k * crossBoundaryIntegrand h k p -
           crossBoundaryIntegrand h (k + 1) p) := by
-    refine Measure.ae_prod_mem_iff_ae_ae_mem
-      (measurableSet_Ioc.prod measurableSet_Ioi) |>.2 ?_ |>.mono ?_
-    · filter_upwards [hleft] with y hy
-      filter_upwards [hright] with z hz
-      exact ⟨hy, hz⟩
-    · intro p hp
-      exact curvatureSignedEnvelopeDensity_eq_crossBoundary_difference h k
-        hp.1.1 (lt_trans hu hp.2)
+    filter_upwards [hrect] with p hp
+    exact curvatureSignedEnvelopeDensity_eq_crossBoundary_difference h k
+      hp.1.1 (lt_trans hu hp.2)
   have hK := K_eq_crossBoundaryIntegral h k hu
   have hK1 := K_eq_crossBoundaryIntegral h (k + 1) hu
   change (∫ p, curvatureSignedEnvelopeDensity h k p ∂(μL.prod μR)) = _
