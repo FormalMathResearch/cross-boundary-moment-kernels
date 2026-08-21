@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this Lean formalization, please cite this software and the associated manuscript (DOI: 10.5281/zenodo.22033635)."
+title: "Cross-Boundary Moment Kernels: Lean 4 Formalization"
+type: software
+authors:
+  - family-names: Fahlberg
+    given-names: Tobias
+version: 1.0.0
+date-released: 2026-08-21
+repository-code: "https://github.com/FormalMathResearch/cross-boundary-moment-kernels"
+license: MIT
+keywords:
+  - Lean 4
+  - mathlib
+  - formal verification
+  - moment kernels
+  - total positivity
+  - size bias
+  - curvature
