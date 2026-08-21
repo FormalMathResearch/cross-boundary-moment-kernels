@@ -1,5 +1,5 @@
 name = "cross_boundary_moment_kernels"
-version = "0.1.0"
+version = "1.0.0"
 defaultTargets = ["CrossBoundaryMomentKernels", "Cross_boundary_moment_kernels"]
 
 [leanOptions]
