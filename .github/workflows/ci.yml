@@ -23,3 +23,22 @@ jobs:
           use-github-cache: true
           use-mathlib-cache: true
           leanchecker: true
+
+  # On pull requests, GitHub's default checkout verifies the synthetic merge ref above.
+  # Verify the exact submitted head SHA as well so publication-facing verification can be
+  # attributed to an immutable commit, independently of GitHub's generated merge commit.
+  build-pr-head:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          build: true
+          build-args: "--wfail"
+          use-github-cache: true
+          use-mathlib-cache: true
+          leanchecker: true

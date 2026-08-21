@@ -168,7 +168,7 @@ theorem inter_order_variance_trichotomy
     (variance_gt_reserve_iff_Lambda_gt_Omega h hk).symm
   exact ⟨hlt, heq, hgt⟩
 
-/-- **Necessary normalization curvature for increasing crossing order (manuscript Theorem 2.4).**
+/-- **Necessary normalization curvature for increasing crossing order (manuscript Corollary 2.4).**
 Since `Λ_k(u) > 1` universally, `u_k^* < u_{k+1}^*` forces `Ω_k > 1`. -/
 theorem crossing_order_implies_one_lt_Omega
     (h : FullSupportMomentWeight) {k : ℕ} (hk : 1 ≤ k)

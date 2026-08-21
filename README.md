@@ -1,6 +1,6 @@
 # Cross-Boundary Moment Kernels
 
-Lean formalization of cross-boundary moment kernels, one-crossing geometry, total positivity, size bias, and curvature.
+Lean formalization of cross-boundary moment kernels, one-crossing geometry, total positivity, size bias, Gamma models, and curvature.
 
 ## Overview
 
@@ -8,7 +8,9 @@ This repository is the formal-verification companion to the mathematical manuscr
 
 **Cross-Boundary Moment Kernels: One-Crossing Geometry, Total Positivity, Size Bias, and Curvature.**
 
-The project aims to formalize the main definitions, identities, and proofs in **Lean 4** with **mathlib**, and to use the formalization as an independent check of the mathematical argument before the publication revision of the manuscript.
+The aim is to formalize the manuscript's main definitions, identities, and proofs in **Lean 4** with **mathlib**, and to use the formalization as an independent mathematical check before publication.
+
+For a theorem-by-theorem mapping from the manuscript to Lean declarations, including hypothesis notes and verification scope, see **[`MANUSCRIPT_VERIFICATION.md`](MANUSCRIPT_VERIFICATION.md)**.
 
 ## Mathematical scope
 
@@ -26,192 +28,123 @@ and the cross-boundary determinants
 K_k(u) = J_k(u) I_{k+1} - J_{k+1}(u) I_k.
 \]
 
-The planned formalization covers, in particular:
-
-- positivity and the cross-boundary integral representation of `K_k`;
-- strict log-convexity of the moment sequence;
-- the quadratic derivative structure of the crossing kernel;
-- the universal one-crossing theorem;
-- strict total positivity of order two for the normalized hierarchy;
-- the truncated Gram/variance decomposition;
-- the multiplicative size-bias hierarchy;
-- the inter-order equivalence principle at the canonical crossing;
-- the exactly solvable Gamma model and its sharp crossing threshold;
-- the curvature-pairing identity, including the required integration and Fubini arguments.
+The Lean development includes the manuscript's full-support moment-weight framework, the cross-boundary representation and one-crossing geometry, strict TP2, the truncated Gram decomposition, the multiplicative size-bias hierarchy, the inter-order equivalence and trichotomy, the exactly solvable Gamma model, and the curvature-pairing theorem with its absolute-convergence and Fubini justification.
 
 ## Formalization status
 
-**Stage 8: eight manuscript result blocks verified.** The project contains the manuscript-level definitions of the half-integer moments, full-support moment weights, the cross-boundary determinant, the canonical normalization, the two crossing kernels, the cross-boundary probability laws, and the local/global relative curvature quantities `Lambda` and `Omega`.
+The current development contains publication-facing Lean statements for the following manuscript results:
 
-The following manuscript results have complete end-to-end Lean proofs and have passed `lake build --wfail` together with `leanchecker`:
+- **Theorem 2.2(i)–(vi)** — cross-boundary representation, universal one-crossing geometry, strict TP2, truncated Gram decomposition, and multiplicative size bias;
+- **Theorem 2.3** — six-way inter-order equivalence;
+- **Corollary 2.4** — necessary normalization curvature;
+- **Theorem 2.5** — curvature pairing;
+- **Corollary 2.6** — curvature balance for log-concave weights;
+- **Theorem 2.7** — exact Gamma model and sharp adjacent-crossing threshold;
+- **Corollaries 2.8 and 2.9** — explicit counterexamples showing that neither log-concavity nor positive moment curvature alone forces increasing crossing order;
+- **Proposition 2.10** — exact Gamma product law;
+- **Lemma 3.1** — strict moment log-convexity;
+- **Remark 4.1** — equality and reversed inter-order trichotomies.
 
-- **Lemma 3.1 — strict moment log-convexity:**
-  \(I_{k+1}^2 < I_k I_{k+2}\) for every \(k \ge 0\), together with the strict increase of \(\gamma_k = I_{k+1}/I_k\).
-- **Theorem 2.2(i) — positive cross-boundary representation:** for every \(u>0\), `K_k(u)` is represented by the cross-boundary integral over \(0<y\le u<z\), and \(K_k(u)>0\). The repository also proves the manuscript-exact integrand identity
-  \((yz)^{k-1/2}(z-y)h(y)h(z)\) and the corresponding iterated-integral formula.
-- **Theorem 2.2(ii)–(iii) — quadratic derivative law and universal one-crossing geometry:** for every manuscript index \(k\ge1\), the derivative quadratic has strictly positive discriminant and two distinct positive roots \(0<\xi_{k,-}<\xi_{k,+}\). The crossing kernel `R_k` is locally absolutely continuous on the positive half-line and satisfies, almost everywhere,
-  \[
-  R_k'(x)=2I_{k+1}x^{k-1/2}h(x)Q_k(x).
-  \]
-  There is a unique positive zero \(u_k^*\in(\xi_{k,-},\xi_{k,+})\); both `R_k` and the normalized kernel `Rhat_k` are strictly positive before \(u_k^*\) and strictly negative after it.
-- **Theorem 2.2(iv) — strict total positivity of order two:** for every \(k\ge1\), the adjacent normalized quotient \(u\mapsto Z_{k+1}(u)/Z_k(u)\) is strictly increasing on \((0,\infty)\). Consequently, for every pair of manuscript indices \(1\le m<n\) and every \(0<u<v\),
-  \[
-  Z_m(u)Z_n(v)-Z_n(u)Z_m(v)>0.
-  \]
-  The Lean proof kernel-checks the manuscript derivative ratio \(Z'_{k+1}=C_k\phi_k Z'_k\), the strict monotonicity of \(\phi_k\) on both sides of its pole, the three ratio regions, and the iteration from adjacent indices to arbitrary \(m<n\).
-- **Theorem 2.2(v) — truncated Gram/variance decomposition:** for every \(k\ge1\) and \(u>0\), with
-  \[
-  \mu_k(u)=\frac{J_{k+2}(u)}{J_{k+1}(u)},\qquad
-  v_k(u)=\frac{J_{k+3}(u)}{J_{k+1}(u)}-\mu_k(u)^2,
-  \]
-  the repository proves the exact identity
-  \[
-  \frac{R_{k+1}(u)}{2I_{k+2}J_{k+1}(u)}
-  =v_k(u)+Q_{k+1}(\mu_k(u)),
-  \]
-  the strict inequality \(v_k(u)>0\), its Hankel-ratio form, and the manuscript-exact symmetrized Gram formula
-  \[
-  J_{k+1}J_{k+3}-J_{k+2}^2
-  =\frac12\int_0^u\int_0^u
-  (yz)^{k+1/2}(y-z)^2h(y)h(z)\,dy\,dz.
-  \]
-- **Theorem 2.2(vi) — multiplicative size-bias hierarchy:** for every \(k\ge0\) and \(u>0\), the manuscript density
-  \[
-  d\nu_{k,u}(y,z)=\frac{(yz)^{k-1/2}(z-y)h(y)h(z)}{K_k(u)}\,dy\,dz,
-  \qquad 0<y\le u<z,
-  \]
-  is formalized as an actual probability measure. For \(X=YZ\), Lean proves for every integer \(m\ge0\)
-  \[
-  \mathbb E_{k,u}[X^m]=\frac{K_{k+m}(u)}{K_k(u)},
-  \]
-  and the exact Radon--Nikodym size-bias identity
-  \[
-  d\nu_{k+1,u}=\frac{X}{\mathbb E_{k,u}X}\,d\nu_{k,u}.
-  \]
-  Writing \(M_k(u)=\mathbb E_{k,u}X=K_{k+1}(u)/K_k(u)\), the formalization establishes \(X\in L^2(\nu_{k,u})\), identifies the genuine `ProbabilityTheory.variance`, and proves
-  \[
-  M_{k+1}(u)-M_k(u)
-  =\frac{\operatorname{Var}_{k,u}(X)}{M_k(u)}>0.
-  \]
-- **Theorem 2.3 — six-way inter-order equivalence:** for every \(k\ge1\), Lean proves that the following six conditions are equivalent at the canonical crossing \(u_k^*\):
-  \[
-  u_k^*<u_{k+1}^*,
-  \qquad R_{k+1}(u_k^*)>0,
-  \]
-  \[
-  Z_{k+1}(u_k^*)^2>Z_k(u_k^*)Z_{k+2}(u_k^*),
-  \]
-  \[
-  v_k(u_k^*)+Q_{k+1}(\mu_k(u_k^*))>0,
-  \]
-  \[
-  \operatorname{Var}_{k,u_k^*}(X)<\tau_k(\tau_{k+1}-\tau_k),
-  \]
-  and
-  \[
-  \Lambda_k(u_k^*)<\Omega_k,
-  \qquad
-  \Lambda_k(u)=\frac{K_k(u)K_{k+2}(u)}{K_{k+1}(u)^2},
-  \qquad
-  \Omega_k=\frac{N_kN_{k+2}}{N_{k+1}^2}.
-  \]
-  The same development proves the manuscript identities
-  \[
-  \Lambda_k(u)=1+\frac{\operatorname{Var}_{k,u}(X)}{M_k(u)^2},
-  \qquad
-  \Omega_k=\frac{\tau_{k+1}}{\tau_k},
-  \qquad
-  \frac{Z_k(u)Z_{k+2}(u)}{Z_{k+1}(u)^2}=\frac{\Lambda_k(u)}{\Omega_k},
-  \]
-  and the exact three-way alternative from Remark 4.1. In particular, the equality case is proved directly:
-  \[
-  u_k^*=u_{k+1}^*
-  \iff \Lambda_k(u_k^*)=\Omega_k
-  \iff \operatorname{Var}_{k,u_k^*}(X)=\tau_k(\tau_{k+1}-\tau_k),
-  \]
-  with the analogous equivalence for reversed inequalities.
-- **Theorem 2.4 — necessary normalization curvature:** increasing crossing order forces
-  \[
-  \Omega_k>1.
-  \]
-  Lean derives this exactly as in the manuscript from the universal strict inequality \(\Lambda_k(u)>1\) and the Theorem 2.3 criterion \(\Lambda_k(u_k^*)<\Omega_k\).
+The manuscript's **Definition 2.1** is mirrored by `FullSupportMomentWeight` in `Basic.lean`.
 
-The one-crossing development also kernel-checks the integrated derivative law and the exact upper-tail identity for `R_k`. These replace the informal endpoint-limit passages inside the Lean proof while preserving the manuscript statement and hypotheses. The three monotonicity phases are made strict directly from the manuscript full-support condition, not from a stronger assumption that `h` is pointwise positive everywhere.
+A result should be regarded as **Lean-verified** only when its statement has been audited against the manuscript and the exact relevant PR state has passed both `lake build --wfail` and `leanchecker`. The authoritative theorem-by-theorem scope is recorded in [`MANUSCRIPT_VERIFICATION.md`](MANUSCRIPT_VERIFICATION.md).
 
-Likewise, the strict-TP2 development uses exact lower-primitive, difference, and upper-tail identities for `Z_k`. The lower and upper ratio zones are proved by strict gap integrals supported on positive-measure subintervals supplied by the manuscript full-support hypothesis; no stronger pointwise positivity or smoothness assumption on `h` is introduced.
+### Manuscript-hypothesis discipline
 
-For the truncated Gram block, strictness is again obtained from the manuscript full-support hypothesis. The formal proof places two disjoint positive-measure support slices inside `(0,u)` and uses their product rectangle to force the symmetrized square integrand to have positive integral. No pointwise positivity or additional regularity assumption on `h` is introduced.
+The formalization is deliberately conservative about assumptions:
 
-For the multiplicative size-bias block, strict variance positivity is likewise proved without pointwise positivity of `h`. A two-copy Gram identity gives
-\[
-K_k(u)K_{k+2}(u)-K_{k+1}(u)^2
-=\frac12\iint f_k(p)f_k(q)\bigl(X(p)-X(q)\bigr)^2\,d\mu(p)\,d\mu(q)>0,
-\]
-and full support supplies two positive-measure cross-boundary rectangles on which the product variable `X = YZ` has separated ranges. This proves non-degeneracy and the strict variance drift using exactly the manuscript support hypothesis.
+- strictness is derived from the manuscript full-support condition rather than replacing it by pointwise positivity of `h`;
+- the one-crossing derivative law is stated almost everywhere, matching the regularity available for a merely measurable weight;
+- Gamma results are split when necessary so that `k ≥ 1` is not imposed on all-index identities;
+- in Theorem 2.5, `h' = -V'h` is derived from `h = exp(-V)` and `V ∈ C²(0,∞)` rather than assumed separately;
+- the signed curvature Fubini step is performed only after an explicit finite absolute Tonelli estimate using the manuscript envelope.
 
-The inter-order formalization combines the already verified one-crossing, Gram, and size-bias results without adding any new regularity or positivity assumptions. The matching identities `M_k(u_k^*) = τ_k` and `Z_k(u_k^*) = Z_{k+1}(u_k^*) > 0` are proved explicitly before the six equivalences are chained. Equality and reversed crossing order are then proved as separate equivalences rather than inferred only by exclusion.
+No mathematical hypothesis is intentionally strengthened merely to make Lean proofs easier. If a future formalization step requires a genuine change to the manuscript, that change should be documented explicitly.
 
-All headline proofs retain the mathematical argument through local `have` and `calc` blocks. The verified proofs contain no `sorry` placeholders.
+## Curvature theorem API
 
-No other mathematical theorem in the manuscript should be regarded as Lean-verified until its corresponding proof has been completed and CI has passed. Verification status is recorded theorem by theorem as the development progresses.
+For publication and citation there is a single manuscript-facing curvature theorem/corollary endpoint:
 
-The intended order of development is now to formalize the exactly solvable Gamma model as an independent algebraic test of the abstract theory, and finally the more analytic curvature-pairing argument.
+- `curvature_theorem_2_5`
+- `curvature_corollary_2_6`
 
-## Toolchain
+both in `CrossBoundaryMomentKernels/CurvatureManuscriptForm.lean`.
+
+Theorem 2.5 exposes the manuscript hypotheses individually. Its visible proof follows the actual causal chain used by Lean: exact two-copy representation, symmetry plus the `C²` FTC step, and signed Fubini with identification of the inner bracket as `R_k`. The lower-level integration-by-parts, tilted-law, covariance, Tonelli, and integrability results remain modular kernel-checked dependencies.
+
+## CI and verification provenance
 
 The project is pinned to:
 
 - **Lean 4.32.1**
 - **mathlib v4.32.1**
 
-GitHub Actions builds with warnings treated as failures and runs `leanchecker` on pushes to `main` and on pull requests targeting `main`.
+GitHub Actions treats warnings as failures and runs `leanchecker`.
+
+For pull requests, CI checks both relevant commit notions:
+
+- `build` checks GitHub's normal synthetic merge ref against `main`;
+- `build-pr-head` explicitly checks out `github.event.pull_request.head.sha`.
+
+Both jobs run `lake build --wfail` and `leanchecker`. This allows a verification claim to be attached to an immutable PR-head SHA rather than only to GitHub's generated merge commit.
+
+The root module `CrossBoundaryMomentKernels.lean` imports the complete formal development, including the Gamma and curvature manuscript-facing modules.
 
 ## Repository organization
 
-- `CrossBoundaryMomentKernels.lean` — root library module;
-- `CrossBoundaryMomentKernels/Basic.lean` — basic moment-weight and kernel definitions;
-- `CrossBoundaryMomentKernels/MomentLogConvexity.lean` — manuscript Lemma 3.1 and its supporting identities;
-- `CrossBoundaryMomentKernels/CrossBoundaryRepresentation.lean` — end-to-end proof of Theorem 2.2(i) in a robust factorized form;
-- `CrossBoundaryMomentKernels/CrossBoundaryManuscriptForm.lean` — exact translation to the integrand and iterated-integral notation printed in the manuscript;
-- `CrossBoundaryMomentKernels/OneCrossing.lean` — the crossing quadratic, discriminant, roots, and their sign geometry;
-- `CrossBoundaryMomentKernels/OneCrossingAnalysis.lean` — integrable derivative-density normal form;
-- `CrossBoundaryMomentKernels/OneCrossingPrimitive.lean` — integrated derivative, difference, and upper-tail identities;
-- `CrossBoundaryMomentKernels/OneCrossingSigns.lean` — strict derivative-integral signs and the three strict monotonicity phases;
-- `CrossBoundaryMomentKernels/OneCrossingRegularity.lean` — local absolute continuity and the a.e. derivative law;
-- `CrossBoundaryMomentKernels/OneCrossingGeometry.lean` — unique canonical crossing and global sign pattern;
-- `CrossBoundaryMomentKernels/OneCrossingManuscriptForm.lean` — manuscript-exact a.e. derivative statement;
-- `CrossBoundaryMomentKernels/TotalPositivity.lean` — integrable derivative normal form and exact primitive/difference/tail identities for `Z_k`;
-- `CrossBoundaryMomentKernels/TotalPositivityRatio.lean` — the manuscript functions `C_k`, `φ_k`, their algebra, derivative-ratio law, and strict derivative-mass lemmas;
-- `CrossBoundaryMomentKernels/TotalPositivityAdjacent.lean` — strict monotonicity of every adjacent quotient `Z_{k+1}/Z_k` across all three gamma regions;
-- `CrossBoundaryMomentKernels/TotalPositivityHierarchy.lean` — iteration to arbitrary index pairs and the strict TP2 determinant theorem;
-- `CrossBoundaryMomentKernels/GramDecomposition.lean` — positivity of truncated moments, strict truncated Hankel log-convexity, the factorized Gram square, and the exact Gram-plus-transport identity;
-- `CrossBoundaryMomentKernels/GramManuscriptForm.lean` — manuscript-exact `(yz)^{k+1/2}(y-z)^2h(y)h(z)` integrand and iterated double-integral form;
-- `CrossBoundaryMomentKernels/SizeBias.lean` — the cross-boundary base measure and probability density, normalization, general `X^m` moment identity, and mean formula;
-- `CrossBoundaryMomentKernels/SizeBiasShift.lean` — exact multiplicative Radon--Nikodym size-bias step from index `k` to `k+1`;
-- `CrossBoundaryMomentKernels/CrossBoundaryKGram.lean` — two-copy Gram identity and strict index log-convexity of the cross-boundary `K` hierarchy;
-- `CrossBoundaryMomentKernels/SizeBiasVariance.lean` — `L²` integrability, genuine probabilistic variance, strict variance positivity, and the mean drift formula;
-- `CrossBoundaryMomentKernels/SizeBiasManuscriptForm.lean` — exact identification of the formal probability law with the density printed in Theorem 2.2(vi);
-- `CrossBoundaryMomentKernels/InterOrder.lean` — definitions of `Lambda` and `Omega`, crossing matching, kernel/mean factorization, and the local/global curvature identities;
-- `CrossBoundaryMomentKernels/InterOrderEquivalence.lean` — the five connecting equivalences and the complete six-way statement of Theorem 2.3;
-- `CrossBoundaryMomentKernels/InterOrderTrichotomy.lean` — equality and reversed-order cases, the curvature and variance trichotomies from Remark 4.1, and Theorem 2.4;
-- `.github/workflows/ci.yml` — Lean/mathlib CI build and kernel checking;
+### Foundations and Theorem 2.2
+
+- `CrossBoundaryMomentKernels/Basic.lean` — Definition 2.1, moments, determinants, normalization, and crossing kernels;
+- `CrossBoundaryMomentKernels/MomentLogConvexity.lean` — manuscript Lemma 3.1;
+- `CrossBoundaryMomentKernels/CrossBoundaryRepresentation.lean` and `CrossBoundaryManuscriptForm.lean` — Theorem 2.2(i);
+- `CrossBoundaryMomentKernels/OneCrossing*.lean` — Theorem 2.2(ii)–(iii), including regularity and manuscript derivative form;
+- `CrossBoundaryMomentKernels/TotalPositivity*.lean` — Theorem 2.2(iv);
+- `CrossBoundaryMomentKernels/GramDecomposition.lean` and `GramManuscriptForm.lean` — Theorem 2.2(v);
+- `CrossBoundaryMomentKernels/SizeBias*.lean` and `CrossBoundaryKGram.lean` — Theorem 2.2(vi).
+
+### Inter-order theory
+
+- `CrossBoundaryMomentKernels/InterOrder.lean` — `Lambda`, `Omega`, crossing matching, and local/global curvature identities;
+- `CrossBoundaryMomentKernels/InterOrderEquivalence.lean` — Theorem 2.3;
+- `CrossBoundaryMomentKernels/InterOrderTrichotomy.lean` — Remark 4.1 and Corollary 2.4.
+
+### Gamma model
+
+- `CrossBoundaryMomentKernels/GammaModel.lean`, `GammaRecurrence.lean`, `GammaExplicit.lean` — analytic and algebraic Gamma identities;
+- `CrossBoundaryMomentKernels/GammaCorollaries.lean` — scale/curvature and crossing consequences;
+- `CrossBoundaryMomentKernels/GammaProductLaw.lean`, `GammaProductMGF.lean`, `GammaProductDistribution.lean` — exact product-law formalization;
+- `CrossBoundaryMomentKernels/GammaManuscriptForm.lean` — publication-facing Theorem 2.7, Corollaries 2.8–2.9, and Proposition 2.10.
+
+### Curvature pairing
+
+- `CrossBoundaryMomentKernels/CurvaturePairing.lean` and `CurvaturePairingMoments.lean` — manuscript analytic hypotheses and Lemma 5.1 specializations;
+- `CrossBoundaryMomentKernels/CurvatureTiltedMeasure.lean` and `CurvatureCovariance.lean` — tilted law and covariance reduction;
+- `CrossBoundaryMomentKernels/CurvatureTwoCopy*.lean` — two-copy representation of moment curvature;
+- `CrossBoundaryMomentKernels/CurvatureFTC.lean` — local `C²` FTC step;
+- `CrossBoundaryMomentKernels/CurvatureTonelli.lean`, `CurvatureEnvelopeIntegrability.lean`, `CurvatureAbsoluteTonelli.lean`, `CurvatureAbsoluteIntegrability.lean` — absolute-convergence gate;
+- `CrossBoundaryMomentKernels/CurvatureBracket.lean`, `CurvatureSignedFubini*.lean`, `CurvatureSignedIntegrability.lean` — signed Fubini and identification with `R_k`;
+- `CrossBoundaryMomentKernels/CurvatureSymmetryFTC.lean` — symmetry and ordered-region bridge;
+- `CrossBoundaryMomentKernels/CurvatureBalance.lean` — analytic crossing split used by Corollary 2.6;
+- `CrossBoundaryMomentKernels/CurvatureManuscriptForm.lean` — publication-facing Theorem 2.5 and Corollary 2.6.
+
+### Reproducibility and audit
+
+- `CrossBoundaryMomentKernels.lean` — root library module importing the formal development;
+- `MANUSCRIPT_VERIFICATION.md` — manuscript-to-Lean verification matrix;
+- `.github/workflows/ci.yml` — merge-ref and exact-PR-head CI;
 - `lakefile.toml` and `lean-toolchain` — reproducible project configuration.
 
 Further modules follow the mathematical dependency structure of the manuscript rather than its page layout whenever that makes the formalization clearer.
 
-## Goals
+## Goals and scope of the verification claim
 
 The project has two complementary goals:
 
-1. produce a reproducible Lean formalization of the main mathematical results;
-2. detect any hidden assumptions, indexing issues, normalization errors, or proof gaps before the manuscript is prepared for publication.
+1. produce a reproducible Lean formalization of the manuscript's mathematical claims;
+2. detect hidden assumptions, indexing issues, normalization errors, or proof gaps before publication.
 
-If the Lean development requires a mathematical change to the manuscript, that change will be documented explicitly rather than hidden in the formalization.
+Lean verification does not by itself establish novelty, literature priority, bibliographic completeness, or editorial quality. Those remain separate scientific and publication checks.
 
-## Paper status
+## Release metadata
 
-The accompanying manuscript has undergone an independent mathematical referee-style audit. The Lean development is the next verification stage before the publication revision.
-
-## License and citation
-
-License and citation metadata will be added once the formalization and manuscript release structure are finalized.
+A publication release should pin an immutable repository tag, exact commit SHA, Lean/mathlib versions, and successful CI provenance. Citation metadata, a repository license, and an archival DOI should be added before treating the repository as the final citable software artifact.
