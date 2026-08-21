@@ -1,5 +1,7 @@
 # Cross-Boundary Moment Kernels
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22046413.svg)](https://doi.org/10.5281/zenodo.22046413)
+
 Lean formalization of cross-boundary moment kernels, one-crossing geometry, total positivity, size bias, Gamma models, and curvature.
 
 ## Overview
@@ -145,6 +147,15 @@ The project has two complementary goals:
 
 Lean verification does not by itself establish novelty, literature priority, bibliographic completeness, or editorial quality. Those remain separate scientific and publication checks.
 
-## Release metadata
+## Release and citation
 
-A publication release should pin an immutable repository tag, exact commit SHA, Lean/mathlib versions, and successful CI provenance. Citation metadata, a repository license, and an archival DOI should be added before treating the repository as the final citable software artifact.
+The first archival software release is **v1.0.0**, preserved on Zenodo.
+
+- **Software DOI:** `10.5281/zenodo.22046413`
+- **Associated manuscript DOI:** `10.5281/zenodo.22033635`
+- **GitHub release tag:** `v1.0.0`
+- **Release commit:** `24ad78e423893f700ca45f40817c36aae851e101`
+- **Toolchain:** Lean 4.32.1, mathlib v4.32.1
+- **License:** MIT
+
+The software DOI identifies the archived Lean artifact and is intentionally distinct from the manuscript DOI. Machine-readable citation metadata are provided in [`CITATION.cff`](CITATION.cff).
